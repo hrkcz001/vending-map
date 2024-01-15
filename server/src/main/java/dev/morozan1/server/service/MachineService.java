@@ -1,0 +1,42 @@
+package dev.morozan1.server.service;
+
+import dev.morozan1.server.entity.Machine;
+import dev.morozan1.server.repository.MachineProductRepository;
+import dev.morozan1.server.repository.MachineRepository;
+import dev.morozan1.server.repository.ProductRepository;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class MachineService {
+
+    private final MachineRepository machineRepository;
+
+    public MachineService(MachineRepository machineRepository, MachineProductRepository machineProductRepository, ProductRepository productRepository, ModelMapper modelMapper) {
+        this.machineRepository = machineRepository;
+    }
+
+    private Double distance (Double latitude1, Double longitude1, Double latitude2, Double longitude2) {
+        return Math.sqrt(Math.pow(latitude1 - latitude2, 2) + Math.pow(longitude1 - longitude2, 2));
+    }
+
+    public List<Machine> getMachines(Double latitude, Double longitude, Double radius) {
+        List<Machine> machines = machineRepository.findAll();
+        if (latitude != null && longitude != null && radius != null) {
+            machines = machines.stream()
+                    .filter(machine -> distance(latitude, longitude, machine.getLatitude(), machine.getLongitude()) <= radius)
+                    .toList();
+        }
+        return machines;
+    }
+
+    public Machine getMachine(Long id) {
+        return machineRepository.findById(id).orElseThrow();
+    }
+
+    public Machine createMachine(Machine machine) {
+        return machineRepository.save(machine);
+    }
+}
