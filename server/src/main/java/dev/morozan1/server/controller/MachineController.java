@@ -11,8 +11,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
-import static dev.morozan1.server.util.MachineDtoMapper.convertToDto;
+import static dev.morozan1.server.dto.mapper.MachineToMachineResponseDtoMapper.convertToDto;
 
 @RestController
 @RequestMapping("/api/machines")
@@ -30,32 +31,45 @@ public class MachineController {
 
 
     @GetMapping
-    public ResponseEntity<List<MachineResponseDto>> getMachines(@RequestParam(required = false) Double latitude,
+    public ResponseEntity<?> getMachines(@RequestParam(required = false) Double latitude,
                                                                 @RequestParam(required = false) Double longitude,
                                                                 @RequestParam(required = false) Double radius) {
-        List<Machine> machines = machineService.getMachines(latitude, longitude, radius);
+        try {
+            List<Machine> machines = machineService.getMachines(latitude, longitude, radius);
 
-        List<MachineResponseDto> machineResponseDto = machines.stream()
-                .map(machine -> convertToDto(machine, modelMapper))
-                .toList();
 
-        return ResponseEntity.ok(machineResponseDto);
+            List<MachineResponseDto> machineResponseDto = machines.stream()
+                    .map(machine -> convertToDto(machine, modelMapper))
+                    .toList();
+
+            return ResponseEntity.ok(machineResponseDto);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MachineResponseDto> getMachine(@PathVariable Long id) {
-        Machine machine = machineService.getMachine(id);
-
-        MachineResponseDto machineResponseDto = convertToDto(machine, modelMapper);
-
-        return ResponseEntity.ok(machineResponseDto);
+    public ResponseEntity<?> getMachine(@PathVariable Long id) {
+        try {
+            Machine machine = machineService.getMachine(id);
+            MachineResponseDto machineResponseDto = convertToDto(machine, modelMapper);
+            return ResponseEntity.ok(machineResponseDto);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
     @PostMapping
-    public ResponseEntity<MachineResponseDto> createMachine(@Validated @RequestBody CreateMachineRequestDto machineRequestDto) {
-        Machine machine = modelMapper.map(machineRequestDto, Machine.class);
-        Machine createdMachine = machineService.createMachine(machine);
-        MachineResponseDto machineResponseDto = convertToDto(createdMachine, modelMapper);
-        return ResponseEntity.ok(machineResponseDto);
+    public ResponseEntity<?> createMachine(@Validated @RequestBody CreateMachineRequestDto machineRequestDto) {
+        try {
+            Machine machine = modelMapper.map(machineRequestDto, Machine.class);
+            Machine createdMachine = machineService.createMachine(machine);
+            MachineResponseDto machineResponseDto = convertToDto(createdMachine, modelMapper);
+            return ResponseEntity.ok(machineResponseDto);
+        } catch (IllegalArgumentException | NullPointerException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }

@@ -1,4 +1,4 @@
-package dev.morozan1.server.util;
+package dev.morozan1.server.dto.mapper;
 
 import dev.morozan1.server.dto.CoordinatesDto;
 import dev.morozan1.server.dto.CreateMachineRequestDto;
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import java.sql.Time;
 
 @Component
-public class CreateMachineRequestDtoToMachineConverter extends AbstractConverter<CreateMachineRequestDto, Machine> {
+public class CreateMachineRequestDtoToMachineMapper extends AbstractConverter<CreateMachineRequestDto, Machine> {
 
     @Override
     protected Machine convert(CreateMachineRequestDto source) {

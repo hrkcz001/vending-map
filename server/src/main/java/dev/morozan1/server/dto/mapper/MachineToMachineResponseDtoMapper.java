@@ -1,4 +1,4 @@
-package dev.morozan1.server.util;
+package dev.morozan1.server.dto.mapper;
 
 import dev.morozan1.server.dto.CoordinatesDto;
 import dev.morozan1.server.dto.MachineResponseDto;
@@ -10,7 +10,7 @@ import org.modelmapper.ModelMapper;
 import java.util.List;
 import java.util.Set;
 
-public class MachineDtoMapper {
+public class MachineToMachineResponseDtoMapper {
     public static MachineResponseDto convertToDto(Machine machine, ModelMapper modelMapper) {
         MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
 

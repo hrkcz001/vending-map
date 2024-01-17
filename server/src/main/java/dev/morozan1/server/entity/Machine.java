@@ -2,11 +2,14 @@ package dev.morozan1.server.entity;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 
 import jakarta.persistence.*;
 import java.sql.Time;
 import java.util.*;
+
+import static dev.morozan1.server.util.AreaUtil.isInArea;
 
 @Entity
 @Getter
@@ -14,6 +17,7 @@ import java.util.*;
 public class Machine {
 
     @Id
+    @Setter
     @Column(name = "MACHINE_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long machineId;
@@ -46,15 +50,9 @@ public class Machine {
     @OneToMany(mappedBy = "machine", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<MachineProduct> machineProducts = new HashSet<>();
 
-
-    public void setMachineId(Long machineId) {
-        Objects.requireNonNull(machineId, "Machine id must not be null");
-        this.machineId = machineId;
-    }
-
     public void setLatitude(Double latitude) {
         Objects.requireNonNull(latitude, "Machine latitude must not be null");
-        if (this.longitude != null && !isInPrague(latitude, this.longitude)) {
+        if (this.longitude != null && !isInArea(latitude, this.longitude)) {
             throw new IllegalArgumentException("Machine must be in Prague");
         }
         this.latitude = latitude;
@@ -62,7 +60,7 @@ public class Machine {
 
     public void setLongitude(Double longitude) {
         Objects.requireNonNull(longitude, "Machine longitude must not be null");
-        if (this.latitude != null && !isInPrague(this.latitude, longitude)) {
+        if (this.latitude != null && !isInArea(this.latitude, longitude)) {
             throw new IllegalArgumentException("Machine must be in Prague");
         }
         this.longitude = longitude;
@@ -72,21 +70,11 @@ public class Machine {
         Objects.requireNonNull(coordinates, "Machine coordinates must not be null");
         Objects.requireNonNull(coordinates.getFirst(), "Machine latitude must not be null");
         Objects.requireNonNull(coordinates.getSecond(), "Machine longitude must not be null");
-        if (!isInPrague(coordinates.getFirst(), coordinates.getSecond())) {
+        if (!isInArea(coordinates.getFirst(), coordinates.getSecond())) {
             throw new IllegalArgumentException("Machine must be in Prague");
         }
         this.latitude = coordinates.getFirst();
         this.longitude = coordinates.getSecond();
-    }
-
-    public static Boolean isInPrague(double latitude, double longitude) {
-        double pragueMinLatitude = 49.9417;
-        double pragueMaxLatitude = 50.1768;
-        double pragueMinLongitude = 14.2257;
-        double pragueMaxLongitude = 14.7070;
-
-        return latitude >= pragueMinLatitude && latitude <= pragueMaxLatitude &&
-                longitude >= pragueMinLongitude && longitude <= pragueMaxLongitude;
     }
 
     public void setAddress(String address) {
@@ -125,21 +113,24 @@ public class Machine {
             return null;
         }
 
-        return reviews.stream()
+        double result = reviews.stream()
                 .mapToDouble(Review::getRating)
                 .average()
-                .orElse(0.0);
+                .orElse(-1);
+
+        if (result == -1) {
+            return null;
+        }
+        return result;
     }
 
     public void addReview(Review review) {
         Objects.requireNonNull(review, "Review must not be null");
 
-        if (reviews.contains(review)) {
-            throw new IllegalArgumentException("Review is already in machine");
+        if (!reviews.contains(review)){
+            reviews.add(review);
+            review.setMachine(this);
         }
-
-        reviews.add(review);
-        review.setMachine(this);
     }
 
     public void removeReview(Review review) {

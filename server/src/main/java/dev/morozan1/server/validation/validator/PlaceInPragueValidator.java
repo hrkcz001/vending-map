@@ -1,10 +1,11 @@
 package dev.morozan1.server.validation.validator;
 
 import dev.morozan1.server.dto.CoordinatesDto;
-import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.validation.PlaceInPrague;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+
+import static dev.morozan1.server.util.AreaUtil.isInArea;
 
 public class PlaceInPragueValidator implements ConstraintValidator<PlaceInPrague, CoordinatesDto> {
 
@@ -17,6 +18,6 @@ public class PlaceInPragueValidator implements ConstraintValidator<PlaceInPrague
         double latitude = Double.parseDouble(coordinates.getLatitude());
         double longitude = Double.parseDouble(coordinates.getLongitude());
 
-        return Machine.isInPrague(latitude, longitude);
+        return isInArea(latitude, longitude);
     }
 }
