@@ -6,8 +6,10 @@ import dev.morozan1.server.repository.MachineRepository;
 import dev.morozan1.server.repository.ProductRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.sql.Time;
 import java.util.List;
 
 @Service
@@ -39,5 +41,19 @@ public class MachineService {
 
     public Machine createMachine(Machine machine) {
         return machineRepository.save(machine);
+    }
+
+    public Machine updateMachine(Long id, Machine machine) {
+        Machine machineToUpdate = machineRepository.findById(id).orElseThrow();
+        machineToUpdate.setAddress(machine.getAddress());
+        machineToUpdate.setAvailableTime(machine.getAvailableTime());
+        machineToUpdate.setCoordinates(machine.getCoordinates());
+        machineToUpdate.setDescription(machine.getDescription());
+        return machineRepository.save(machineToUpdate);
+    }
+
+    public void deleteMachine(Long id) {
+        machineRepository.findById(id).orElseThrow();
+        machineRepository.deleteById(id);
     }
 }

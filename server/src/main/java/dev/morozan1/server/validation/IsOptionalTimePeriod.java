@@ -1,6 +1,6 @@
 package dev.morozan1.server.validation;
 
-import dev.morozan1.server.validation.validator.PlaceInPragueValidator;
+import dev.morozan1.server.validation.validator.IsOptionalTimePeriodValidator;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
@@ -14,9 +14,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target( {ElementType.FIELD})
 @Retention(RUNTIME)
 @Documented
-@Constraint(validatedBy = PlaceInPragueValidator.class)
-public @interface PlaceInPrague {
-    String message() default "Coordinates must be in Prague";
+@Constraint(validatedBy = IsOptionalTimePeriodValidator.class)
+public @interface IsOptionalTimePeriod {
+    String message() default "Time period is not valid";
     Class<?>[] groups() default { };
     Class<? extends Payload>[] payload() default {};
 }

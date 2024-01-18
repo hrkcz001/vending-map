@@ -77,6 +77,10 @@ public class Machine {
         this.longitude = coordinates.getSecond();
     }
 
+    public Pair<Double, Double> getCoordinates() {
+        return Pair.of(latitude, longitude);
+    }
+
     public void setAddress(String address) {
         Objects.requireNonNull(address, "Machine address must not be null");
         if (address.isBlank()) {
@@ -106,6 +110,13 @@ public class Machine {
             this.availableFrom = null;
             this.availableTo = null;
         }
+    }
+
+    public Pair<Time, Time> getAvailableTime() {
+        if (availableFrom == null || availableTo == null) {
+            return null;
+        }
+        return Pair.of(availableFrom, availableTo);
     }
 
     public Double calculateRating(Set<Review> reviews) {

@@ -10,6 +10,10 @@ import static dev.morozan1.server.util.AreaUtil.isInArea;
 public class PlaceInPragueValidator implements ConstraintValidator<PlaceInPrague, CoordinatesDto> {
 
     @Override
+    public void initialize(PlaceInPrague constraintAnnotation) {
+    }
+
+    @Override
     public boolean isValid(CoordinatesDto coordinates, ConstraintValidatorContext constraintValidatorContext) {
         if (coordinates == null) {
             return false;
