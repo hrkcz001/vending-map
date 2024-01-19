@@ -4,6 +4,7 @@ import dev.morozan1.server.dto.CoordinatesDto;
 import dev.morozan1.server.dto.CUMachineRequestDto;
 import dev.morozan1.server.dto.TimePeriodDto;
 import dev.morozan1.server.entity.Machine;
+import dev.morozan1.server.exception.BadRequestException;
 import org.modelmapper.AbstractConverter;
 import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
@@ -42,8 +43,8 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
             }
 
             return machine;
-        } catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        } catch (NumberFormatException e) {
+            throw new BadRequestException("Latitude, longitude and available time must be numbers in double format");
         }
     }
 }

@@ -3,7 +3,9 @@ package dev.morozan1.server.controller;
 import dev.morozan1.server.dto.CUMachineRequestDto;
 import dev.morozan1.server.dto.MachineResponseDto;
 import dev.morozan1.server.entity.Machine;
-import dev.morozan1.server.exception.NoIdException;
+import dev.morozan1.server.exception.BadRequestException;
+import dev.morozan1.server.exception.BadIdException;
+import dev.morozan1.server.exception.NotFoundException;
 import dev.morozan1.server.service.MachineService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,29 +31,41 @@ public class MachineController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MachineResponseDto>> getMachines(@RequestParam(required = false) Double latitude,
-                                                                @RequestParam(required = false) Double longitude,
-                                                                @RequestParam(required = false) Double radius) {
-        List<Machine> machines = machineService.getMachines(latitude, longitude, radius);
+    public ResponseEntity<List<MachineResponseDto>> getMachines(@RequestParam(required = false) String latitude,
+                                                                @RequestParam(required = false) String longitude,
+                                                                @RequestParam(required = false) String radius) {
+        try {
+            Double latitudeValue = null, longitudeValue = null, radiusValue = null;
+            if (latitude != null && longitude != null && radius != null) {
+                latitudeValue = Double.parseDouble(latitude);
+                longitudeValue = Double.parseDouble(longitude);
+                radiusValue = Double.parseDouble(radius);
+            }
+
+            List<Machine> machines = machineService.getMachines(latitudeValue, longitudeValue, radiusValue);
 
 
-        List<MachineResponseDto> machineResponseDtoList = machines.stream()
+            List<MachineResponseDto> machineResponseDtoList = machines.stream()
                     .map(machine -> modelMapper.map(machine, MachineResponseDto.class))
                     .toList();
 
-        return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
+            if (machineResponseDtoList.isEmpty()) throw new NotFoundException();
+            return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
+        } catch (NumberFormatException e) {
+            throw new BadRequestException("Latitude, longitude and radius must be numbers in double format");
+        }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<MachineResponseDto> getMachine(@PathVariable String id) {
-        if (id == null) throw new NoIdException();
+        if (id == null) throw new BadIdException();
         try {
             Long idValue = Long.parseLong(id);
             Machine machine = machineService.getMachine(idValue);
             MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
             return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            throw new NoIdException();
+            throw new BadIdException();
         }
     }
 
@@ -65,7 +79,7 @@ public class MachineController {
 
     @PutMapping("/{id}")
     public ResponseEntity<MachineResponseDto> updateMachine(@PathVariable String id, @Validated @RequestBody CUMachineRequestDto machineRequestDto) {
-        if (id == null) throw new NoIdException();
+        if (id == null) throw new BadIdException();
         try {
             Long idValue = Long.parseLong(id);
             Machine machine = modelMapper.map(machineRequestDto, Machine.class);
@@ -73,19 +87,19 @@ public class MachineController {
             MachineResponseDto machineResponseDto = modelMapper.map(updatedMachine, MachineResponseDto.class);
             return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            throw new NoIdException();
+            throw new BadIdException();
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteMachine(@PathVariable String id) {
-        if (id == null) throw new NoIdException();
+        if (id == null) throw new BadIdException();
         try {
             Long idValue = Long.parseLong(id);
             machineService.deleteMachine(idValue);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (NumberFormatException e) {
-            throw new NoIdException();
+            throw new BadIdException();
         }
     }
 }

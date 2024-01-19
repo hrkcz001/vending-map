@@ -134,22 +134,6 @@ public class Machine {
         return result;
     }
 
-    public void addReview(Review review) {
-        Objects.requireNonNull(review, "Review must not be null");
-
-        if (!reviews.contains(review)){
-            reviews.add(review);
-            review.setMachine(this);
-        }
-    }
-
-    public void removeReview(Review review) {
-        Objects.requireNonNull(review, "Review must not be null");
-        if (reviews == null) return;
-
-        reviews.remove(review);
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

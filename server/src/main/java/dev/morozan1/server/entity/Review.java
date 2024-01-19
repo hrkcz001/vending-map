@@ -1,13 +1,18 @@
 package dev.morozan1.server.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Objects;
 
+@Getter
 @Entity
 @Table(name = "REVIEW")
 public class Review {
 
     @Id
+    @Setter
     @Column(name = "REVIEW_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reviewId;
@@ -22,26 +27,8 @@ public class Review {
     @Column(name = "COMMENT", length = 300)
     private String comment;
 
-    public Long getReviewId() {
-        return reviewId;
-    }
-
-    public void setReviewId(Long reviewId) {
-        Objects.requireNonNull(reviewId, "Review id must not be null");
-        this.reviewId = reviewId;
-    }
-
-    public Machine getMachine() {
-        return machine;
-    }
-
     public void setMachine(Machine machine) {
-        Objects.requireNonNull(machine, "Machine must not be null");
-        this.machine = machine;
-    }
-
-    public Short getRating() {
-        return rating;
+        this.machine = Objects.requireNonNull(machine, "Machine must not be null");
     }
 
     public void setRating(Short rating) {
@@ -50,10 +37,6 @@ public class Review {
             throw new IllegalArgumentException("Rating must be between 1 and 5");
         }
         this.rating = rating;
-    }
-
-    public String getComment() {
-        return comment;
     }
 
     public void setComment(String comment) {

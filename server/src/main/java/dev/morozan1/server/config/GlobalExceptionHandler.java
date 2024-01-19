@@ -1,7 +1,9 @@
 package dev.morozan1.server.config;
 
 import dev.morozan1.server.dto.ErrorResponseDto;
-import dev.morozan1.server.exception.NoIdException;
+import dev.morozan1.server.exception.BadRequestException;
+import dev.morozan1.server.exception.BadIdException;
+import dev.morozan1.server.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,16 +28,25 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ErrorResponseDto> handleNoSuchElementException(NoSuchElementException e) {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoIdException(BadRequestException e) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+        errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        errorResponseDto.setReasons(List.of(e.getMessage()));
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({ NoSuchElementException.class, NotFoundException.class })
+    public ResponseEntity<ErrorResponseDto> handleNoSuchElementException(Exception e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.NOT_FOUND.value());
         errorResponseDto.setError(HttpStatus.NOT_FOUND.getReasonPhrase());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(NoIdException.class)
-    public ResponseEntity<ErrorResponseDto> handleNoIdException(NoIdException e) {
+    @ExceptionHandler(BadIdException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoIdException(BadIdException e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
         errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
