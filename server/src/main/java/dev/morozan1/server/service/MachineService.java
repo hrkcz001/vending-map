@@ -23,9 +23,11 @@ public class MachineService {
         this.machineRepository = machineRepository;
     }
 
-    public List<Machine> getMachines(Double latitude, Double longitude, Double radius) {
-        if (latitude == null || longitude == null || radius == null) return machineRepository.findAll();
+    public List<Machine> getMachines() {
+        return machineRepository.findAll();
+    }
 
+    public List<Machine> getMachinesInRadius(double latitude, double longitude, double radius) {
         double minLatitude = latitude - (radius / 111.32);
         double maxLatitude = latitude + (radius / 111.32);
         double minLongitude = longitude - (radius / (111.32 * Math.cos(latitude)));

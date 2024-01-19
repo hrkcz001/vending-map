@@ -30,6 +30,9 @@ public class MachineProduct {
     @Column(name = "AVAILABILITY", nullable = false)
     private Boolean availability;
 
+    @Column(name = "PRICE", nullable = false)
+    private Double price;
+
     public void setMachine(Machine machine) {
         Objects.requireNonNull(machine, "Machine must not be null");
         this.machine = machine;

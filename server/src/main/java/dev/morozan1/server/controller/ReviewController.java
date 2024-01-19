@@ -3,6 +3,7 @@ package dev.morozan1.server.controller;
 import dev.morozan1.server.dto.CreateReviewRequestDto;
 import dev.morozan1.server.dto.ReviewResponseDto;
 import dev.morozan1.server.dto.UpdateReviewRequestDto;
+import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.entity.Review;
 import dev.morozan1.server.exception.BadRequestException;
 import dev.morozan1.server.exception.BadIdException;
@@ -18,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/reviews")
+@RequestMapping("/api")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -31,28 +32,33 @@ public class ReviewController {
         this.modelMapper = modelMapper;
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ReviewResponseDto>> getReviews(@RequestParam(required = false) String machineId) {
+    @GetMapping("/reviews")
+    public ResponseEntity<List<ReviewResponseDto>> getReviews() {
+        List<Review> reviews = reviewService.getReviews();
+        List<ReviewResponseDto> reviewResponseDtoList = reviews.stream()
+                .map(review -> modelMapper.map(review, ReviewResponseDto.class))
+                .toList();
+        return new ResponseEntity<>(reviewResponseDtoList, HttpStatus.OK);
+    }
+
+    @GetMapping("/machines/{machineId}/reviews")
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByMachine(@PathVariable String machineId) {
         try {
-            Long machineIdValue = null;
-            if (machineId != null) {
-                machineIdValue = Long.parseLong(machineId);
-            }
+            if (machineId == null) throw new BadIdException();
+            long machineIdValue = Long.parseLong(machineId);
 
-            List<Review> reviews = reviewService.getReviews(machineIdValue);
-
+            List<Review> reviews = reviewService.getReviewsByMachineId(machineIdValue);
             List<ReviewResponseDto> reviewResponseDtoList = reviews.stream()
                     .map(review -> modelMapper.map(review, ReviewResponseDto.class))
                     .toList();
 
-            if (reviewResponseDtoList.isEmpty()) throw new NotFoundException();
             return new ResponseEntity<>(reviewResponseDtoList, HttpStatus.OK);
         } catch (NumberFormatException e) {
-            throw new BadRequestException("Machine id must be a number");
+            throw new BadIdException();
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/reviews/{id}")
     public ResponseEntity<ReviewResponseDto> getReview(@PathVariable String id) {
         if (id == null) throw new BadIdException();
         try {
@@ -65,7 +71,7 @@ public class ReviewController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/reviews")
     public ResponseEntity<ReviewResponseDto> createReview(@Validated @RequestBody CreateReviewRequestDto createReviewRequestDto) {
         Review review = modelMapper.map(createReviewRequestDto, Review.class);
         Review createdReview = reviewService.createReview(review);
@@ -73,7 +79,7 @@ public class ReviewController {
         return new ResponseEntity<>(reviewResponseDto, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/reviews/{id}")
     public ResponseEntity<ReviewResponseDto> updateReview(@PathVariable String id, @Validated @RequestBody UpdateReviewRequestDto updateReviewRequestDto) {
         if (id == null) throw new BadIdException();
         try {
@@ -87,7 +93,7 @@ public class ReviewController {
         }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/reviews/{id}")
     public ResponseEntity<Void> deleteReview(@PathVariable String id) {
         if (id == null) throw new BadIdException();
         try {

@@ -128,10 +128,7 @@ public class Machine {
                 .average()
                 .orElse(-1);
 
-        if (result == -1) {
-            return null;
-        }
-        return result;
+        return result == -1 ? null : result;
     }
 
     @Override

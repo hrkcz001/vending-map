@@ -1,13 +1,20 @@
 package dev.morozan1.server.entity;
 
 import jakarta.persistence.*;
-import java.util.Objects;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+
+@Getter
 @Entity
 @Table(name = "PRODUCT")
 public class Product {
 
     @Id
+    @Setter
     @Column(name = "PRODUCT_ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
@@ -15,33 +22,29 @@ public class Product {
     @Column(name = "NAME", nullable = false)
     private String name;
 
+    @Setter
     @Column(name = "PICTURE_URL")
     private String picture;
 
-    public Long getProductId() {
-        return productId;
-    }
-
-    public void setProductId(Long productId) {
-        Objects.requireNonNull(productId, "Product id must not be null");
-        this.productId = productId;
-    }
-
-    public String getName() {
-        return name;
-    }
+    @Setter
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<MachineProduct> productsMachine = new HashSet<>();
 
     public void setName(String name) {
-        Objects.requireNonNull(name, "Product name must not be null");
-        this.name = name;
+        this.name = Objects.requireNonNull(name, "Product name must not be null");
     }
 
-    public String getPicture() {
-        return picture;
-    }
+    public Double getAveragePrice() {
+        if (productsMachine == null || productsMachine.isEmpty()) {
+            return null;
+        }
 
-    public void setPicture(String picture) {
-        this.picture = picture;
+        double result = productsMachine.stream()
+                .mapToDouble(MachineProduct::getPrice)
+                .average()
+                .orElse(-1);
+
+        return result == -1 ? null : result;
     }
 
     @Override

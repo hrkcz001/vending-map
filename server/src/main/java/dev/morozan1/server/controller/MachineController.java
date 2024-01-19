@@ -35,21 +35,20 @@ public class MachineController {
                                                                 @RequestParam(required = false) String longitude,
                                                                 @RequestParam(required = false) String radius) {
         try {
-            Double latitudeValue = null, longitudeValue = null, radiusValue = null;
+            List<Machine> machines;
             if (latitude != null && longitude != null && radius != null) {
-                latitudeValue = Double.parseDouble(latitude);
-                longitudeValue = Double.parseDouble(longitude);
-                radiusValue = Double.parseDouble(radius);
+                double latitudeValue = Double.parseDouble(latitude);
+                double longitudeValue = Double.parseDouble(longitude);
+                double radiusValue = Double.parseDouble(radius);
+                machines = machineService.getMachinesInRadius(latitudeValue, longitudeValue, radiusValue);
+            }else {
+                machines = machineService.getMachines();
             }
-
-            List<Machine> machines = machineService.getMachines(latitudeValue, longitudeValue, radiusValue);
-
 
             List<MachineResponseDto> machineResponseDtoList = machines.stream()
                     .map(machine -> modelMapper.map(machine, MachineResponseDto.class))
                     .toList();
 
-            if (machineResponseDtoList.isEmpty()) throw new NotFoundException();
             return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
         } catch (NumberFormatException e) {
             throw new BadRequestException("Latitude, longitude and radius must be numbers in double format");

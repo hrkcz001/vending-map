@@ -17,8 +17,11 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
     }
 
-    public List<Review> getReviews(Long machineId) {
-        if (machineId == null) return reviewRepository.findAll();
+    public List<Review> getReviews() {
+        return reviewRepository.findAll();
+    }
+
+    public List<Review> getReviewsByMachineId(long machineId) {
         return reviewRepository.findAllByMachineId(machineId);
     }
 
