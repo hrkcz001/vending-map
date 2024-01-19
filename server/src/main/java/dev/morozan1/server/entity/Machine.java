@@ -2,14 +2,13 @@ package dev.morozan1.server.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 
 import jakarta.persistence.*;
 import java.sql.Time;
 import java.util.*;
 
-import static dev.morozan1.server.util.AreaUtil.isInArea;
+import static dev.morozan1.server.utils.AreaUtils.isInArea;
 
 @Entity
 @Getter

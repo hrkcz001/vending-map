@@ -11,6 +11,7 @@ public class MachineResponseDto {
     private CoordinatesDto coordinates;
     private String address;
     private String description;
+
     private Double rating;
     private Integer reviewsCount;
 

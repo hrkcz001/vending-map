@@ -1,7 +1,7 @@
-package dev.morozan1.server.validation.validator;
+package dev.morozan1.server.validator;
 
 import dev.morozan1.server.dto.TimePeriodDto;
-import dev.morozan1.server.validation.IsOptionalTimePeriod;
+import dev.morozan1.server.annotation.IsOptionalTimePeriod;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

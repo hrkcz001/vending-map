@@ -1,16 +1,16 @@
-package dev.morozan1.server.validation.validator;
+package dev.morozan1.server.validator;
 
 import dev.morozan1.server.dto.CoordinatesDto;
-import dev.morozan1.server.validation.PlaceInPrague;
+import dev.morozan1.server.annotation.PlaceInArea;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import static dev.morozan1.server.util.AreaUtil.isInArea;
+import static dev.morozan1.server.utils.AreaUtils.isInArea;
 
-public class PlaceInPragueValidator implements ConstraintValidator<PlaceInPrague, CoordinatesDto> {
+public class PlaceInAreaValidator implements ConstraintValidator<PlaceInArea, CoordinatesDto> {
 
     @Override
-    public void initialize(PlaceInPrague constraintAnnotation) {
+    public void initialize(PlaceInArea constraintAnnotation) {
     }
 
     @Override

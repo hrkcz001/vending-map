@@ -9,6 +9,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.util.HtmlUtils;
 
 import java.sql.Time;
 
@@ -19,8 +20,10 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
     protected Machine convert(CUMachineRequestDto source) {
         try {
             Machine machine = new Machine();
-            machine.setAddress(source.getAddress());
-            machine.setDescription(source.getDescription());
+
+            //Escape HTML
+            machine.setAddress(HtmlUtils.htmlEscape(source.getAddress()));
+            machine.setDescription(HtmlUtils.htmlEscape(source.getDescription()));
 
             CoordinatesDto coordinatesDto = source.getCoordinates();
             if (coordinatesDto != null) {

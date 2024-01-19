@@ -14,8 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static dev.morozan1.server.dto.mapper.MachineToMachineResponseDtoMapper.convertToDto;
-
 @RestController
 @RequestMapping("/api/machines")
 public class MachineController {
@@ -38,7 +36,7 @@ public class MachineController {
 
 
         List<MachineResponseDto> machineResponseDtoList = machines.stream()
-                    .map(machine -> convertToDto(machine, modelMapper))
+                    .map(machine -> modelMapper.map(machine, MachineResponseDto.class))
                     .toList();
 
         return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
@@ -50,7 +48,7 @@ public class MachineController {
         try {
             Long idValue = Long.parseLong(id);
             Machine machine = machineService.getMachine(idValue);
-            MachineResponseDto machineResponseDto = convertToDto(machine, modelMapper);
+            MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
             return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
         } catch (NumberFormatException e) {
             throw new NoIdException();
@@ -61,7 +59,7 @@ public class MachineController {
     public ResponseEntity<MachineResponseDto> createMachine(@Validated @RequestBody CUMachineRequestDto machineRequestDto) {
         Machine machine = modelMapper.map(machineRequestDto, Machine.class);
         Machine createdMachine = machineService.createMachine(machine);
-        MachineResponseDto machineResponseDto = convertToDto(createdMachine, modelMapper);
+        MachineResponseDto machineResponseDto = modelMapper.map(createdMachine, MachineResponseDto.class);
         return new ResponseEntity<>(machineResponseDto, HttpStatus.CREATED);
     }
 
@@ -72,7 +70,7 @@ public class MachineController {
             Long idValue = Long.parseLong(id);
             Machine machine = modelMapper.map(machineRequestDto, Machine.class);
             Machine updatedMachine = machineService.updateMachine(idValue, machine);
-            MachineResponseDto machineResponseDto = convertToDto(updatedMachine, modelMapper);
+            MachineResponseDto machineResponseDto = modelMapper.map(updatedMachine, MachineResponseDto.class);
             return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
         } catch (NumberFormatException e) {
             throw new NoIdException();

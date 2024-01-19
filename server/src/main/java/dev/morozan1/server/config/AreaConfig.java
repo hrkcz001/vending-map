@@ -8,6 +8,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AreaConfig {
 
+    @Value("${area.name}")
+    private String name;
+
     @Value("${area.min.latitude}")
     private Double minLatitude;
 

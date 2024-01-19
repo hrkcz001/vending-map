@@ -4,6 +4,7 @@ import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.repository.MachineProductRepository;
 import dev.morozan1.server.repository.MachineRepository;
 import dev.morozan1.server.repository.ProductRepository;
+import dev.morozan1.server.utils.GeoUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
@@ -22,16 +23,19 @@ public class MachineService {
         this.machineRepository = machineRepository;
     }
 
-    private double distance (double latitude1, double longitude1, double latitude2, double longitude2) {
-        return Math.sqrt(Math.pow(latitude1 - latitude2, 2) + Math.pow(longitude1 - longitude2, 2));
-    }
-
     public List<Machine> getMachines(Double latitude, Double longitude, Double radius) {
-        List<Machine> machines = machineRepository.findAll();
-        if (latitude == null || longitude == null || radius == null) return machines;
+        if (latitude == null || longitude == null || radius == null) return machineRepository.findAll();
+
+        double minLatitude = latitude - (radius / 111.32);
+        double maxLatitude = latitude + (radius / 111.32);
+        double minLongitude = longitude - (radius / (111.32 * Math.cos(latitude)));
+        double maxLongitude = longitude + (radius / (111.32 * Math.cos(latitude)));
+
+        List<Machine> machines = machineRepository.findInSquare(minLatitude, maxLatitude, minLongitude, maxLongitude);
         machines = machines.stream()
-                .filter(machine -> distance(latitude, longitude, machine.getLatitude(), machine.getLongitude()) <= radius)
+                .filter(machine -> GeoUtils.calculateDistance(latitude, longitude, machine.getLatitude(), machine.getLongitude()) <= radius)
                 .toList();
+
         return machines;
     }
 

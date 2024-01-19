@@ -1,8 +1,8 @@
 package dev.morozan1.server.dto;
 
-import dev.morozan1.server.validation.IsOptionalTimePeriod;
-import dev.morozan1.server.validation.NullOrNotBlank;
-import dev.morozan1.server.validation.PlaceInPrague;
+import dev.morozan1.server.annotation.IsOptionalTimePeriod;
+import dev.morozan1.server.annotation.NullOrNotBlank;
+import dev.morozan1.server.annotation.PlaceInArea;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
@@ -15,7 +15,7 @@ public class CUMachineRequestDto {
         @NullOrNotBlank(message = "Description can't be whitespace-only")
         private String description;
 
-        @PlaceInPrague
+        @PlaceInArea
         private CoordinatesDto coordinates;
 
         @IsOptionalTimePeriod

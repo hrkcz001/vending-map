@@ -1,17 +1,17 @@
-package dev.morozan1.server.util;
+package dev.morozan1.server.utils;
 
 import dev.morozan1.server.config.AreaConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class AreaUtil {
+public class AreaUtils {
 
     private static AreaConfig areaConfig;
 
     @Autowired
-    public AreaUtil(AreaConfig areaConfig) {
-        AreaUtil.areaConfig = areaConfig;
+    public AreaUtils(AreaConfig areaConfig) {
+        AreaUtils.areaConfig = areaConfig;
     }
 
     public static boolean isInArea(Double latitude, Double longitude) {

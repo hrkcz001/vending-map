@@ -5,14 +5,25 @@ import dev.morozan1.server.dto.MachineResponseDto;
 import dev.morozan1.server.dto.TimePeriodDto;
 import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.entity.MachineProduct;
-import org.modelmapper.ModelMapper;
+import org.modelmapper.AbstractConverter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 import java.util.Set;
 
-public class MachineToMachineResponseDtoMapper {
-    public static MachineResponseDto convertToDto(Machine machine, ModelMapper modelMapper) {
-        MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
+@Component
+public class MachineToMachineResponseDtoMapper extends AbstractConverter<Machine, MachineResponseDto> {
+
+    @Override
+    protected MachineResponseDto convert(Machine machine) {
+        MachineResponseDto machineResponseDto = new MachineResponseDto();
+
+        machineResponseDto.setMachineId(machine.getMachineId());
+
+        //Escape HTML
+        machineResponseDto.setAddress(HtmlUtils.htmlEscape(machine.getAddress()));
+        machineResponseDto.setDescription(HtmlUtils.htmlEscape(machine.getDescription()));
 
         machineResponseDto.setRating(machine.calculateRating(machine.getReviews()));
         machineResponseDto.setReviewsCount(machine.getReviews().size());
@@ -32,7 +43,7 @@ public class MachineToMachineResponseDtoMapper {
     }
 
 
-    private static List<MachineResponseDto.ProductAvailabilityDto> productAvailabilityList(Set<MachineProduct> machineProductSet) {
+    private List<MachineResponseDto.ProductAvailabilityDto> productAvailabilityList(Set<MachineProduct> machineProductSet) {
         return machineProductSet.stream()
                 .map(entry -> {
                     MachineResponseDto.ProductAvailabilityDto productAvailabilityDto = new MachineResponseDto.ProductAvailabilityDto();
