@@ -1,7 +1,6 @@
 package dev.morozan1.server.dto.mapper;
 
-import dev.morozan1.server.dto.UpdateReviewRequestDto;
-import dev.morozan1.server.entity.Machine;
+import dev.morozan1.server.dto.CUReviewRequestDto;
 import dev.morozan1.server.entity.Review;
 import dev.morozan1.server.exception.BadRequestException;
 import org.modelmapper.AbstractConverter;
@@ -9,10 +8,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
 
 @Component
-public class UpdateReviewRequestDtoToReviewMapper extends AbstractConverter<UpdateReviewRequestDto, Review> {
+public class CUReviewRequestDtoToReviewMapper extends AbstractConverter<CUReviewRequestDto, Review> {
 
     @Override
-    protected Review convert(UpdateReviewRequestDto source) {
+    protected Review convert(CUReviewRequestDto source) {
         try {
             Review review = new Review();
 

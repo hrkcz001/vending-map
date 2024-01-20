@@ -37,21 +37,7 @@ public class MachineToMachineResponseDtoMapper extends AbstractConverter<Machine
             timePeriodDto.setAvailableTo(machine.getAvailableTo().toString().substring(0, 5));
             machineResponseDto.setAvailableTime(timePeriodDto);
         }
-        machineResponseDto.setProducts(productAvailabilityList(machine.getMachineProducts()));
 
         return machineResponseDto;
     }
-
-
-    private List<MachineResponseDto.ProductAvailabilityDto> productAvailabilityList(Set<MachineProduct> machineProductSet) {
-        return machineProductSet.stream()
-                .map(entry -> {
-                    MachineResponseDto.ProductAvailabilityDto productAvailabilityDto = new MachineResponseDto.ProductAvailabilityDto();
-                    productAvailabilityDto.setProductId(entry.getProduct().getProductId());
-                    productAvailabilityDto.setAvailability(entry.getAvailability());
-                    return productAvailabilityDto;
-                })
-                .toList();
-    }
-
 }

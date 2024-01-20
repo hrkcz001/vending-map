@@ -1,12 +1,15 @@
 package dev.morozan1.server.controller;
 
 import dev.morozan1.server.dto.CUMachineRequestDto;
+import dev.morozan1.server.dto.CUReviewRequestDto;
 import dev.morozan1.server.dto.MachineResponseDto;
+import dev.morozan1.server.dto.ReviewResponseDto;
 import dev.morozan1.server.entity.Machine;
+import dev.morozan1.server.entity.Review;
 import dev.morozan1.server.exception.BadRequestException;
 import dev.morozan1.server.exception.BadIdException;
-import dev.morozan1.server.exception.NotFoundException;
 import dev.morozan1.server.service.MachineService;
+import dev.morozan1.server.service.ReviewService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,12 +24,14 @@ import java.util.List;
 public class MachineController {
 
     private final MachineService machineService;
+    private final ReviewService reviewService;
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public MachineController(MachineService machineService, ModelMapper modelMapper) {
+    public MachineController(MachineService machineService, ReviewService reviewService, ModelMapper modelMapper) {
         this.machineService = machineService;
+        this.reviewService = reviewService;
         this.modelMapper = modelMapper;
     }
 
@@ -59,7 +64,7 @@ public class MachineController {
     public ResponseEntity<MachineResponseDto> getMachine(@PathVariable String id) {
         if (id == null) throw new BadIdException();
         try {
-            Long idValue = Long.parseLong(id);
+            long idValue = Long.parseLong(id);
             Machine machine = machineService.getMachine(idValue);
             MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
             return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
@@ -80,7 +85,7 @@ public class MachineController {
     public ResponseEntity<MachineResponseDto> updateMachine(@PathVariable String id, @Validated @RequestBody CUMachineRequestDto machineRequestDto) {
         if (id == null) throw new BadIdException();
         try {
-            Long idValue = Long.parseLong(id);
+            long idValue = Long.parseLong(id);
             Machine machine = modelMapper.map(machineRequestDto, Machine.class);
             Machine updatedMachine = machineService.updateMachine(idValue, machine);
             MachineResponseDto machineResponseDto = modelMapper.map(updatedMachine, MachineResponseDto.class);
@@ -94,9 +99,9 @@ public class MachineController {
     public ResponseEntity<Void> deleteMachine(@PathVariable String id) {
         if (id == null) throw new BadIdException();
         try {
-            Long idValue = Long.parseLong(id);
+            long idValue = Long.parseLong(id);
             machineService.deleteMachine(idValue);
-            return new ResponseEntity<>(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (NumberFormatException e) {
             throw new BadIdException();
         }

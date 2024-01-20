@@ -7,6 +7,6 @@ public class ProductResponseDto {
 
         private Long productId;
         private String name;
-        private String imageUrl;
+        private String picture;
         private Double averagePrice;
 }

@@ -17,31 +17,23 @@ public class ReviewService {
         this.reviewRepository = reviewRepository;
     }
 
-    public List<Review> getReviews() {
-        return reviewRepository.findAll();
-    }
-
-    public List<Review> getReviewsByMachineId(long machineId) {
-        return reviewRepository.findAllByMachineId(machineId);
-    }
-
-    public Review getReview(Long id) {
-        return reviewRepository.findById(id).orElseThrow();
+    public Review getReviewByReviewIdAndMachineId(long reviewId, long machineId) {
+        return reviewRepository.findByMachineAndReviewIds(machineId, reviewId).orElseThrow();
     }
 
     public Review createReview(Review review) {
         return reviewRepository.save(review);
     }
 
-    public Review updateReview(Long id, Review review) {
-        Review reviewToUpdate = reviewRepository.findById(id).orElseThrow();
+    public Review updateReview(long machineId, long reviewId, Review review) {
+        Review reviewToUpdate = reviewRepository.findByMachineAndReviewIds(machineId, reviewId).orElseThrow();
         reviewToUpdate.setRating(review.getRating());
         reviewToUpdate.setComment(review.getComment());
         return reviewRepository.save(reviewToUpdate);
     }
 
-    public void deleteReview(Long id) {
-        reviewRepository.findById(id).orElseThrow();
-        reviewRepository.deleteById(id);
+    public void deleteReview(long machineId, long reviewId) {
+        Review review = reviewRepository.findByMachineAndReviewIds(machineId, reviewId).orElseThrow();
+        reviewRepository.delete(review);
     }
 }

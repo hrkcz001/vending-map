@@ -16,11 +16,4 @@ public class MachineResponseDto {
     private Integer reviewsCount;
 
     private TimePeriodDto availableTime;
-    private List<ProductAvailabilityDto> products;
-
-    @Data
-    public static class ProductAvailabilityDto {
-        private Long productId;
-        private Boolean availability;
-    }
 }

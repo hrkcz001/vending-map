@@ -41,7 +41,7 @@ public class MachineService {
         return machines;
     }
 
-    public Machine getMachine(Long id) {
+    public Machine getMachine(long id) {
         return machineRepository.findById(id).orElseThrow();
     }
 
@@ -49,7 +49,7 @@ public class MachineService {
         return machineRepository.save(machine);
     }
 
-    public Machine updateMachine(Long id, Machine machine) {
+    public Machine updateMachine(long id, Machine machine) {
         Machine machineToUpdate = machineRepository.findById(id).orElseThrow();
         machineToUpdate.setAddress(machine.getAddress());
         machineToUpdate.setAvailableTime(machine.getAvailableTime());
@@ -58,7 +58,7 @@ public class MachineService {
         return machineRepository.save(machineToUpdate);
     }
 
-    public void deleteMachine(Long id) {
+    public void deleteMachine(long id) {
         machineRepository.findById(id).orElseThrow();
         machineRepository.deleteById(id);
     }

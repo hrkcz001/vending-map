@@ -6,6 +6,7 @@ import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -37,6 +38,15 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoIdException(HttpMessageNotReadableException e) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+        errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        errorResponseDto.setReasons(List.of("Error occurred while parsing JSON body"));
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler({ NoSuchElementException.class, NotFoundException.class })
     public ResponseEntity<ErrorResponseDto> handleNoSuchElementException(Exception e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
@@ -60,7 +70,7 @@ public class GlobalExceptionHandler {
         errorResponseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
 
         // DEBUG ONLY
-        errorResponseDto.setError(e.getMessage());
+        errorResponseDto.setError(e.toString());
         //______________
 
         //errorResponseDto.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());

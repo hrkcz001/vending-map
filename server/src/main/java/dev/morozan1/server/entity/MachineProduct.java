@@ -3,6 +3,8 @@ package dev.morozan1.server.entity;
 import lombok.Getter;
 
 import jakarta.persistence.*;
+import lombok.Setter;
+
 import java.util.Objects;
 
 @Entity
@@ -30,6 +32,7 @@ public class MachineProduct {
     @Column(name = "AVAILABILITY", nullable = false)
     private Boolean availability;
 
+    @Setter
     @Column(name = "PRICE", nullable = false)
     private Double price;
 

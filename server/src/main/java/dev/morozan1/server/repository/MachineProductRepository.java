@@ -7,10 +7,13 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MachineProductRepository extends JpaRepository<MachineProduct, Long> {
 
-    @Query("SELECT mp FROM MachineProduct mp WHERE mp.machine.machineId = :machineId")
-    List<MachineProduct> findAllByMachineId(@Param("machineId") long machineId);
+    @Query("SELECT mp FROM MachineProduct mp WHERE mp.machine.machineId = :machineId " +
+                                              "AND mp.product.productId = :productId")
+    Optional<MachineProduct> findByMachineAndProduct(@Param("machineId") long machineId,
+                                                     @Param("productId") long productId);
 }
