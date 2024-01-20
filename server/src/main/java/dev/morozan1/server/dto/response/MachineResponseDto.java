@@ -1,5 +1,7 @@
-package dev.morozan1.server.dto;
+package dev.morozan1.server.dto.response;
 
+import dev.morozan1.server.dto.CoordinatesDto;
+import dev.morozan1.server.dto.TimePeriodDto;
 import lombok.Data;
 
 import java.util.List;

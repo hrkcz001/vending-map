@@ -1,6 +1,6 @@
 package dev.morozan1.server.dto.mapper;
 
-import dev.morozan1.server.dto.CUMachineProductRequestDto;
+import dev.morozan1.server.dto.request.CUMachineProductRequestDto;
 import dev.morozan1.server.entity.MachineProduct;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;

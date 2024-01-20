@@ -1,6 +1,6 @@
 package dev.morozan1.server.dto.mapper;
 
-import dev.morozan1.server.dto.CUReviewRequestDto;
+import dev.morozan1.server.dto.request.CUReviewRequestDto;
 import dev.morozan1.server.entity.Review;
 import dev.morozan1.server.exception.BadRequestException;
 import org.modelmapper.AbstractConverter;

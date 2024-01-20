@@ -1,7 +1,7 @@
 package dev.morozan1.server.dto.mapper;
 
-import dev.morozan1.server.dto.MachineProductResponseDto;
-import dev.morozan1.server.dto.ProductResponseDto;
+import dev.morozan1.server.dto.response.MachineProductResponseDto;
+import dev.morozan1.server.dto.response.ProductResponseDto;
 import dev.morozan1.server.entity.MachineProduct;
 import org.modelmapper.AbstractConverter;
 import org.modelmapper.ModelMapper;

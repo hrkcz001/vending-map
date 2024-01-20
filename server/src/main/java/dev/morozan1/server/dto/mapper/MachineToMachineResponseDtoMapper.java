@@ -1,16 +1,12 @@
 package dev.morozan1.server.dto.mapper;
 
 import dev.morozan1.server.dto.CoordinatesDto;
-import dev.morozan1.server.dto.MachineResponseDto;
+import dev.morozan1.server.dto.response.MachineResponseDto;
 import dev.morozan1.server.dto.TimePeriodDto;
 import dev.morozan1.server.entity.Machine;
-import dev.morozan1.server.entity.MachineProduct;
 import org.modelmapper.AbstractConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.HtmlUtils;
-
-import java.util.List;
-import java.util.Set;
 
 @Component
 public class MachineToMachineResponseDtoMapper extends AbstractConverter<Machine, MachineResponseDto> {

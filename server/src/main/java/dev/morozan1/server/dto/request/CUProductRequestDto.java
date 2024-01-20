@@ -1,4 +1,4 @@
-package dev.morozan1.server.dto;
+package dev.morozan1.server.dto.request;
 
 import dev.morozan1.server.annotation.NullOrNotBlank;
 import jakarta.validation.constraints.NotBlank;

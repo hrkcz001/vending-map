@@ -1,8 +1,10 @@
-package dev.morozan1.server.dto;
+package dev.morozan1.server.dto.request;
 
 import dev.morozan1.server.annotation.IsOptionalTimePeriod;
 import dev.morozan1.server.annotation.NullOrNotBlank;
 import dev.morozan1.server.annotation.PlaceInArea;
+import dev.morozan1.server.dto.CoordinatesDto;
+import dev.morozan1.server.dto.TimePeriodDto;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 

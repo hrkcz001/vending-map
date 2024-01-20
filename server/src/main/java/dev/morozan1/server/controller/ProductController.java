@@ -1,7 +1,7 @@
 package dev.morozan1.server.controller;
 
-import dev.morozan1.server.dto.CUProductRequestDto;
-import dev.morozan1.server.dto.ProductResponseDto;
+import dev.morozan1.server.dto.request.CUProductRequestDto;
+import dev.morozan1.server.dto.response.ProductResponseDto;
 import dev.morozan1.server.entity.Product;
 import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.ProductService;

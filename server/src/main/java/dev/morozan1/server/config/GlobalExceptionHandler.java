@@ -1,6 +1,6 @@
 package dev.morozan1.server.config;
 
-import dev.morozan1.server.dto.ErrorResponseDto;
+import dev.morozan1.server.dto.response.ErrorResponseDto;
 import dev.morozan1.server.exception.BadRequestException;
 import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.exception.NotFoundException;

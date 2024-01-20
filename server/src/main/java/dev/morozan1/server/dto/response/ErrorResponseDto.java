@@ -1,4 +1,4 @@
-package dev.morozan1.server.dto;
+package dev.morozan1.server.dto.response;
 
 import lombok.Data;
 

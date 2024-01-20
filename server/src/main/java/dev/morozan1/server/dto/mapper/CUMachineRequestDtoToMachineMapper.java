@@ -1,15 +1,13 @@
 package dev.morozan1.server.dto.mapper;
 
 import dev.morozan1.server.dto.CoordinatesDto;
-import dev.morozan1.server.dto.CUMachineRequestDto;
+import dev.morozan1.server.dto.request.CUMachineRequestDto;
 import dev.morozan1.server.dto.TimePeriodDto;
 import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.exception.BadRequestException;
 import org.modelmapper.AbstractConverter;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.util.HtmlUtils;
 
 import java.sql.Time;
