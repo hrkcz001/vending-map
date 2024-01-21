@@ -7,7 +7,7 @@ COPY server/src ./src
 RUN gradle build -x test --no-daemon
 
 FROM openjdk:21-rc-slim
-LABEL key="vending-map-server" author="morozan1"
+LABEL key="vending-map-server"
 
 WORKDIR /app
 COPY --from=buildServerSide /app/build/libs/server.jar server.jar

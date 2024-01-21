@@ -3,6 +3,7 @@ package dev.morozan1.server.config;
 import dev.morozan1.server.dto.response.ErrorResponseDto;
 import dev.morozan1.server.exception.BadRequestException;
 import dev.morozan1.server.exception.BadIdException;
+import dev.morozan1.server.exception.ForbiddenException;
 import dev.morozan1.server.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -74,16 +75,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<ErrorResponseDto> handleForbiddenException(ForbiddenException e) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+        errorResponseDto.setStatus(HttpStatus.FORBIDDEN.value());
+        errorResponseDto.setError(HttpStatus.FORBIDDEN.getReasonPhrase());
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDto> handleException(Exception e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
-
-        // DEBUG ONLY
-        errorResponseDto.setError(e.toString());
-        //______________
-
-        //errorResponseDto.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        errorResponseDto.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
