@@ -22,5 +22,9 @@ out/
 *.iml
 *.ipr
 
+node_modules/
+elm-stuff/
+dist/
+
 .DS_Store
 Thumbs.db
