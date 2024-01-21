@@ -11,6 +11,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.validation.FieldError;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -44,6 +45,15 @@ public class GlobalExceptionHandler {
         errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
         errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
         errorResponseDto.setReasons(List.of("Error occurred while parsing JSON body"));
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponseDto> handleNoIdException(MethodArgumentTypeMismatchException e) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
+        errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
+        errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
+        errorResponseDto.setReasons(List.of("Error occurred while parsing request parameters"));
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 

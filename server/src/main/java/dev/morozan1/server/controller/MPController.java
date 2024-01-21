@@ -38,91 +38,56 @@ public class MPController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<MachineProductResponseDto>> getProductsByMachine(@PathVariable String machineId) {
-        if (machineId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
+    public ResponseEntity<List<MachineProductResponseDto>> getProductsByMachine(@PathVariable long machineId) {
+        Machine machine = machineService.getMachine(machineId);
+        List<MachineProductResponseDto> machineProductResponseDtoList = machine.getMachineProducts().stream()
+                .map(machineProduct -> modelMapper.map(machineProduct, MachineProductResponseDto.class))
+                .toList();
 
-            Machine machine = machineService.getMachine(machineIdValue);
-            List<MachineProductResponseDto> machineProductResponseDtoList = machine.getMachineProducts().stream()
-                    .map(machineProduct -> modelMapper.map(machineProduct, MachineProductResponseDto.class))
-                    .toList();
-
-            return new ResponseEntity<>(machineProductResponseDtoList, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(machineProductResponseDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{productId}")
-    public ResponseEntity<MachineProductResponseDto> getProductByMachine(@PathVariable String machineId, @PathVariable String productId) {
-        if (machineId == null || productId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long productIdValue = Long.parseLong(productId);
+    public ResponseEntity<MachineProductResponseDto> getProductByMachine(@PathVariable long machineId,
+                                                                         @PathVariable long productId) {
+        MachineProduct machineProduct = machineProductService.getMachineProduct(machineId, productId);
+        MachineProductResponseDto machineProductResponseDto = modelMapper.map(machineProduct, MachineProductResponseDto.class);
 
-            MachineProduct machineProduct = machineProductService.getMachineProduct(machineIdValue, productIdValue);
-            MachineProductResponseDto machineProductResponseDto = modelMapper.map(machineProduct, MachineProductResponseDto.class);
-
-            return new ResponseEntity<>(machineProductResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(machineProductResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{productId}")
-    public ResponseEntity<MachineProductResponseDto> addProductToMachine(@PathVariable String machineId,
-                                                                         @PathVariable String productId,
+    public ResponseEntity<MachineProductResponseDto> addProductToMachine(@PathVariable long machineId,
+                                                                         @PathVariable long productId,
                                                                          @Validated @RequestBody CUMachineProductRequestDto machineProductRequestDto) {
-        if (machineId == null || productId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long productIdValue = Long.parseLong(productId);
+        MachineProduct machineProduct = modelMapper.map(machineProductRequestDto, MachineProduct.class);
+        machineProduct.setMachine(machineService.getMachine(machineId));
+        machineProduct.setProduct(productService.getProduct(productId));
+        MachineProduct createdMachineProduct = machineProductService.createMachineProduct(machineProduct);
+        MachineProductResponseDto machineProductResponseDto = modelMapper.map(createdMachineProduct, MachineProductResponseDto.class);
 
-            MachineProduct machineProduct = modelMapper.map(machineProductRequestDto, MachineProduct.class);
-            machineProduct.setMachine(machineService.getMachine(machineIdValue));
-            machineProduct.setProduct(productService.getProduct(productIdValue));
-            MachineProduct createdMachineProduct = machineProductService.createMachineProduct(machineProduct);
-            MachineProductResponseDto machineProductResponseDto = modelMapper.map(createdMachineProduct, MachineProductResponseDto.class);
-
-            return new ResponseEntity<>(machineProductResponseDto, HttpStatus.CREATED);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(machineProductResponseDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<MachineProductResponseDto> updateProductInMachine(@PathVariable String machineId,
-                                                                            @PathVariable String productId,
+    public ResponseEntity<MachineProductResponseDto> updateProductInMachine(@PathVariable long machineId,
+                                                                            @PathVariable long productId,
                                                                             @Validated @RequestBody CUMachineProductRequestDto machineProductRequestDto) {
-        if (machineId == null || productId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long productIdValue = Long.parseLong(productId);
+        MachineProduct machineProduct = modelMapper.map(machineProductRequestDto, MachineProduct.class);
+        machineProduct.setMachine(machineService.getMachine(machineId));
+        machineProduct.setProduct(productService.getProduct(productId));
+        MachineProduct updatedMachineProduct = machineProductService.updateMachineProduct(machineProduct);
+        MachineProductResponseDto machineProductResponseDto = modelMapper.map(updatedMachineProduct, MachineProductResponseDto.class);
 
-            MachineProduct machineProduct = modelMapper.map(machineProductRequestDto, MachineProduct.class);
-            machineProduct.setMachine(machineService.getMachine(machineIdValue));
-            machineProduct.setProduct(productService.getProduct(productIdValue));
-            MachineProduct updatedMachineProduct = machineProductService.updateMachineProduct(machineProduct);
-            MachineProductResponseDto machineProductResponseDto = modelMapper.map(updatedMachineProduct, MachineProductResponseDto.class);
-
-            return new ResponseEntity<>(machineProductResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(machineProductResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProductFromMachine(@PathVariable String machineId, @PathVariable String productId) {
+    public ResponseEntity<Void> deleteProductFromMachine(@PathVariable Long machineId,
+                                                         @PathVariable Long productId) {
         if (machineId == null || productId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long productIdValue = Long.parseLong(productId);
 
-            machineProductService.deleteMachineProduct(machineIdValue, productIdValue);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        machineProductService.deleteMachineProduct(machineId, productId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

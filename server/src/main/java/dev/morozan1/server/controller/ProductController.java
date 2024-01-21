@@ -37,16 +37,10 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable String id) {
-        if (id == null) throw new BadIdException();
-        try {
-            Long idValue = Long.parseLong(id);
-            Product product = productService.getProduct(idValue);
-            ProductResponseDto productResponseDto = modelMapper.map(product, ProductResponseDto.class);
-            return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<ProductResponseDto> getProduct(@PathVariable long id) {
+        Product product = productService.getProduct(id);
+        ProductResponseDto productResponseDto = modelMapper.map(product, ProductResponseDto.class);
+        return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
     }
 
     @PostMapping()
@@ -58,28 +52,17 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable String id, @Validated @RequestBody CUProductRequestDto productRequestDto) {
-        if (id == null) throw new BadIdException();
-        try {
-            Long idValue = Long.parseLong(id);
-            Product product = modelMapper.map(productRequestDto, Product.class);
-            Product updatedProduct = productService.updateProduct(idValue, product);
-            ProductResponseDto productResponseDto = modelMapper.map(updatedProduct, ProductResponseDto.class);
-            return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<ProductResponseDto> updateProduct(@PathVariable long id,
+                                                            @Validated @RequestBody CUProductRequestDto productRequestDto) {
+        Product product = modelMapper.map(productRequestDto, Product.class);
+        Product updatedProduct = productService.updateProduct(id, product);
+        ProductResponseDto productResponseDto = modelMapper.map(updatedProduct, ProductResponseDto.class);
+        return new ResponseEntity<>(productResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable String id) {
-        if (id == null) throw new BadIdException();
-        try {
-            Long idValue = Long.parseLong(id);
-            productService.deleteProduct(idValue);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<Void> deleteProduct(@PathVariable long id) {
+        productService.deleteProduct(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

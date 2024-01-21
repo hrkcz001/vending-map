@@ -3,10 +3,8 @@ package dev.morozan1.server.controller;
 import dev.morozan1.server.dto.request.CUMachineRequestDto;
 import dev.morozan1.server.dto.response.MachineResponseDto;
 import dev.morozan1.server.entity.Machine;
-import dev.morozan1.server.exception.BadRequestException;
 import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.MachineService;
-import dev.morozan1.server.service.ReviewService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,53 +19,38 @@ import java.util.List;
 public class MachineController {
 
     private final MachineService machineService;
-    private final ReviewService reviewService;
 
     private final ModelMapper modelMapper;
 
     @Autowired
-    public MachineController(MachineService machineService, ReviewService reviewService, ModelMapper modelMapper) {
+    public MachineController(MachineService machineService, ModelMapper modelMapper) {
         this.machineService = machineService;
-        this.reviewService = reviewService;
         this.modelMapper = modelMapper;
     }
 
     @GetMapping
-    public ResponseEntity<List<MachineResponseDto>> getMachines(@RequestParam(required = false) String latitude,
-                                                                @RequestParam(required = false) String longitude,
-                                                                @RequestParam(required = false) String radius) {
-        try {
-            List<Machine> machines;
-            if (latitude != null && longitude != null && radius != null) {
-                double latitudeValue = Double.parseDouble(latitude);
-                double longitudeValue = Double.parseDouble(longitude);
-                double radiusValue = Double.parseDouble(radius);
-                machines = machineService.getMachinesInRadius(latitudeValue, longitudeValue, radiusValue);
-            }else {
-                machines = machineService.getMachines();
-            }
-
-            List<MachineResponseDto> machineResponseDtoList = machines.stream()
-                    .map(machine -> modelMapper.map(machine, MachineResponseDto.class))
-                    .toList();
-
-            return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("Latitude, longitude and radius must be numbers in double format");
+    public ResponseEntity<List<MachineResponseDto>> getMachines(@RequestParam(required = false) Double latitude,
+                                                                @RequestParam(required = false) Double longitude,
+                                                                @RequestParam(required = false) Double radius) {
+        List<Machine> machines;
+        if (latitude != null && longitude != null && radius != null) {
+               machines = machineService.getMachinesInRadius(latitude, longitude, radius);
+        }else {
+            machines = machineService.getMachines();
         }
+
+        List<MachineResponseDto> machineResponseDtoList = machines.stream()
+                .map(machine -> modelMapper.map(machine, MachineResponseDto.class))
+                .toList();
+
+        return new ResponseEntity<>(machineResponseDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MachineResponseDto> getMachine(@PathVariable String id) {
-        if (id == null) throw new BadIdException();
-        try {
-            long idValue = Long.parseLong(id);
-            Machine machine = machineService.getMachine(idValue);
-            MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
-            return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<MachineResponseDto> getMachine(@PathVariable long id) {
+        Machine machine = machineService.getMachine(id);
+        MachineResponseDto machineResponseDto = modelMapper.map(machine, MachineResponseDto.class);
+        return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
     }
 
     @PostMapping
@@ -79,28 +62,18 @@ public class MachineController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<MachineResponseDto> updateMachine(@PathVariable String id, @Validated @RequestBody CUMachineRequestDto machineRequestDto) {
-        if (id == null) throw new BadIdException();
-        try {
-            long idValue = Long.parseLong(id);
-            Machine machine = modelMapper.map(machineRequestDto, Machine.class);
-            Machine updatedMachine = machineService.updateMachine(idValue, machine);
-            MachineResponseDto machineResponseDto = modelMapper.map(updatedMachine, MachineResponseDto.class);
-            return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<MachineResponseDto> updateMachine(@PathVariable long id,
+                                                            @Validated @RequestBody CUMachineRequestDto machineRequestDto) {
+        Machine machine = modelMapper.map(machineRequestDto, Machine.class);
+        Machine updatedMachine = machineService.updateMachine(id, machine);
+        MachineResponseDto machineResponseDto = modelMapper.map(updatedMachine, MachineResponseDto.class);
+        return new ResponseEntity<>(machineResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMachine(@PathVariable String id) {
+    public ResponseEntity<Void> deleteMachine(@PathVariable Long id) {
         if (id == null) throw new BadIdException();
-        try {
-            long idValue = Long.parseLong(id);
-            machineService.deleteMachine(idValue);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        machineService.deleteMachine(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

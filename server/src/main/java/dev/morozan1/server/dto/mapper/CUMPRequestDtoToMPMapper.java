@@ -11,8 +11,8 @@ public class CUMPRequestDtoToMPMapper extends AbstractConverter<CUMachineProduct
     @Override
     public MachineProduct convert(CUMachineProductRequestDto source) {
         MachineProduct machineProduct = new MachineProduct();
-        machineProduct.setAvailability(Boolean.parseBoolean(source.getIsAvailable()));
-        machineProduct.setPrice(Double.parseDouble(source.getPrice()));
+        machineProduct.setAvailability(source.getIsAvailable());
+        machineProduct.setPrice(source.getPrice());
         return machineProduct;
     }
 }

@@ -26,8 +26,8 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
 
             CoordinatesDto coordinatesDto = source.getCoordinates();
             if (coordinatesDto != null) {
-                Double latitude = Double.parseDouble(coordinatesDto.getLatitude());
-                Double longitude = Double.parseDouble(coordinatesDto.getLongitude());
+                Double latitude = coordinatesDto.getLatitude();
+                Double longitude = coordinatesDto.getLongitude();
                 Pair<Double, Double> coordinates = Pair.of(latitude, longitude);
                 machine.setCoordinates(coordinates);
             }

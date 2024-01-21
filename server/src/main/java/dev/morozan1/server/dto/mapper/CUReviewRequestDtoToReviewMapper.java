@@ -15,7 +15,7 @@ public class CUReviewRequestDtoToReviewMapper extends AbstractConverter<CUReview
         try {
             Review review = new Review();
 
-            review.setRating(Short.parseShort(source.getRating()));
+            review.setRating(source.getRating());
 
             //Escape HTML
             review.setComment(HtmlUtils.htmlEscape(source.getComment()));

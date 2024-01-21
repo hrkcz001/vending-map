@@ -19,9 +19,6 @@ public class PlaceInAreaValidator implements ConstraintValidator<PlaceInArea, Co
             return false;
         }
 
-        double latitude = Double.parseDouble(coordinates.getLatitude());
-        double longitude = Double.parseDouble(coordinates.getLongitude());
-
-        return isInArea(latitude, longitude);
+        return isInArea(coordinates.getLatitude(), coordinates.getLongitude());
     }
 }

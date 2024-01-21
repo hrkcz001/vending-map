@@ -32,86 +32,51 @@ public class ReviewController {
     }
 
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewsByMachine(@PathVariable String id) {
-        if (id == null) throw new BadIdException();
-        try {
-            long idValue = Long.parseLong(id);
-
-            Machine machine = machineService.getMachine(idValue);
-            List<ReviewResponseDto> reviewResponseDtoList = machine.getReviews().stream()
-                    .map(review -> modelMapper.map(review, ReviewResponseDto.class))
-                    .toList();
-
-            return new ResponseEntity<>(reviewResponseDtoList, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+    public ResponseEntity<List<ReviewResponseDto>> getReviewsByMachine(@PathVariable long id) {
+        Machine machine = machineService.getMachine(id);
+        List<ReviewResponseDto> reviewResponseDtoList = machine.getReviews().stream()
+                .map(review -> modelMapper.map(review, ReviewResponseDto.class))
+                .toList();
+        return new ResponseEntity<>(reviewResponseDtoList, HttpStatus.OK);
     }
 
     @GetMapping("/{machineId}/reviews/{reviewId}")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByMachine(@PathVariable String machineId, @PathVariable String reviewId) {
-        if (machineId == null || reviewId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long reviewIdValue = Long.parseLong(reviewId);
+    public ResponseEntity<List<ReviewResponseDto>> getReviewByMachine(@PathVariable long machineId,
+                                                                      @PathVariable long reviewId) {
+        Review review = reviewService.getReviewByReviewIdAndMachineId(reviewId, machineId);
+        ReviewResponseDto reviewResponseDto = modelMapper.map(review, ReviewResponseDto.class);
 
-            Review review = reviewService.getReviewByReviewIdAndMachineId(reviewIdValue, machineIdValue);
-            ReviewResponseDto reviewResponseDto = modelMapper.map(review, ReviewResponseDto.class);
-
-            return new ResponseEntity<>(List.of(reviewResponseDto), HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(List.of(reviewResponseDto), HttpStatus.OK);
     }
 
     @PostMapping("/{id}/reviews")
-    public ResponseEntity<ReviewResponseDto> createReview(@PathVariable String id, @Validated @RequestBody CUReviewRequestDto reviewRequestDto) {
-        if (id == null) throw new BadIdException();
-        try {
-            long idValue = Long.parseLong(id);
+    public ResponseEntity<ReviewResponseDto> createReview(@PathVariable long id,
+                                                          @Validated @RequestBody CUReviewRequestDto reviewRequestDto) {
+        Machine machine = machineService.getMachine(id);
+        Review review = modelMapper.map(reviewRequestDto, Review.class);
+        Review createdReview = reviewService.createReview(review);
+        machine.addReview(review);
 
-            Machine machine = machineService.getMachine(idValue);
-            Review review = modelMapper.map(reviewRequestDto, Review.class);
-            Review createdReview = reviewService.createReview(review);
-            machine.addReview(review);
+        ReviewResponseDto createdReviewResponseDto = modelMapper.map(createdReview, ReviewResponseDto.class);
 
-            ReviewResponseDto createdReviewResponseDto = modelMapper.map(createdReview, ReviewResponseDto.class);
-
-            return new ResponseEntity<>(createdReviewResponseDto, HttpStatus.CREATED);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(createdReviewResponseDto, HttpStatus.CREATED);
     }
 
     @PutMapping("/{machineId}/reviews/{reviewId}")
-    public ResponseEntity<ReviewResponseDto> updateReview(@PathVariable String machineId, @PathVariable String reviewId, @Validated @RequestBody CUReviewRequestDto reviewRequestDto) {
-        if (machineId == null || reviewId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long reviewIdValue = Long.parseLong(reviewId);
+    public ResponseEntity<ReviewResponseDto> updateReview(@PathVariable long machineId,
+                                                          @PathVariable long reviewId,
+                                                          @Validated @RequestBody CUReviewRequestDto reviewRequestDto) {
+        Review newReview = modelMapper.map(reviewRequestDto, Review.class);
+        Review updatedReview = reviewService.updateReview(machineId, reviewId, newReview);
+        ReviewResponseDto updatedReviewResponseDto = modelMapper.map(updatedReview, ReviewResponseDto.class);
 
-            Review newReview = modelMapper.map(reviewRequestDto, Review.class);
-            Review updatedReview = reviewService.updateReview(machineIdValue, reviewIdValue, newReview);
-            ReviewResponseDto updatedReviewResponseDto = modelMapper.map(updatedReview, ReviewResponseDto.class);
-
-            return new ResponseEntity<>(updatedReviewResponseDto, HttpStatus.OK);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
+        return new ResponseEntity<>(updatedReviewResponseDto, HttpStatus.OK);
     }
 
     @DeleteMapping("/{machineId}/reviews/{reviewId}")
-    public ResponseEntity<Void> deleteReview(@PathVariable String machineId, @PathVariable String reviewId) {
-        if (machineId == null || reviewId == null) throw new BadIdException();
-        try {
-            long machineIdValue = Long.parseLong(machineId);
-            long reviewIdValue = Long.parseLong(reviewId);
-
-            reviewService.deleteReview(machineIdValue, reviewIdValue);
-
+    public ResponseEntity<Void> deleteReview(@PathVariable long machineId,
+                                             @PathVariable long reviewId) {
+            reviewService.deleteReview(machineId, reviewId);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (NumberFormatException e) {
-            throw new BadIdException();
-        }
     }
 }

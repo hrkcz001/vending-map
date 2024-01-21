@@ -24,8 +24,8 @@ public class MachineToMachineResponseDtoMapper extends AbstractConverter<Machine
         machineResponseDto.setRating(machine.calculateRating(machine.getReviews()));
         machineResponseDto.setReviewsCount(machine.getReviews().size());
         CoordinatesDto coordinatesDto = new CoordinatesDto();
-        coordinatesDto.setLatitude(String.valueOf(machine.getLatitude()));
-        coordinatesDto.setLongitude(String.valueOf(machine.getLongitude()));
+        coordinatesDto.setLatitude(machine.getLatitude());
+        coordinatesDto.setLongitude(machine.getLongitude());
         machineResponseDto.setCoordinates(coordinatesDto);
         if (machine.getAvailableTo() != null && machine.getAvailableFrom() != null) {
             TimePeriodDto timePeriodDto = new TimePeriodDto();
