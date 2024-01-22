@@ -4,7 +4,6 @@ import dev.morozan1.server.dto.request.CUReviewRequestDto;
 import dev.morozan1.server.dto.response.ReviewResponseDto;
 import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.entity.Review;
-import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.MachineService;
 import dev.morozan1.server.service.ReviewService;
 import org.modelmapper.ModelMapper;
@@ -54,8 +53,8 @@ public class ReviewController {
                                                           @Validated @RequestBody CUReviewRequestDto reviewRequestDto) {
         Machine machine = machineService.getMachine(id);
         Review review = modelMapper.map(reviewRequestDto, Review.class);
+        review.setMachine(machine);
         Review createdReview = reviewService.createReview(review);
-        machine.addReview(review);
 
         ReviewResponseDto createdReviewResponseDto = modelMapper.map(createdReview, ReviewResponseDto.class);
 

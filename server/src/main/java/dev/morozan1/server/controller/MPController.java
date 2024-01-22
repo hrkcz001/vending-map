@@ -4,7 +4,6 @@ import dev.morozan1.server.dto.request.CUMachineProductRequestDto;
 import dev.morozan1.server.dto.response.MachineProductResponseDto;
 import dev.morozan1.server.entity.Machine;
 import dev.morozan1.server.entity.MachineProduct;
-import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.MPService;
 import dev.morozan1.server.service.MachineService;
 import dev.morozan1.server.service.ProductService;
@@ -83,10 +82,8 @@ public class MPController {
     }
 
     @DeleteMapping("/{productId}")
-    public ResponseEntity<Void> deleteProductFromMachine(@PathVariable Long machineId,
-                                                         @PathVariable Long productId) {
-        if (machineId == null || productId == null) throw new BadIdException();
-
+    public ResponseEntity<Void> deleteProductFromMachine(@PathVariable long machineId,
+                                                         @PathVariable long productId) {
         machineProductService.deleteMachineProduct(machineId, productId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

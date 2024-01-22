@@ -118,12 +118,6 @@ public class Machine {
         return Pair.of(availableFrom, availableTo);
     }
 
-    public void addReview(Review review) {
-        Objects.requireNonNull(review, "Review must not be null");
-        reviews.add(review);
-        review.setMachine(this);
-    }
-
     public Double calculateRating(Set<Review> reviews) {
         if (reviews == null || reviews.isEmpty()) {
             return null;

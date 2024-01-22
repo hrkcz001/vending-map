@@ -26,9 +26,7 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
 
             CoordinatesDto coordinatesDto = source.getCoordinates();
             if (coordinatesDto != null) {
-                Double latitude = coordinatesDto.getLatitude();
-                Double longitude = coordinatesDto.getLongitude();
-                Pair<Double, Double> coordinates = Pair.of(latitude, longitude);
+                Pair<Double, Double> coordinates = Pair.of(coordinatesDto.getLatitude(), coordinatesDto.getLongitude());
                 machine.setCoordinates(coordinates);
             }
 
@@ -41,8 +39,8 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
             }
 
             return machine;
-        } catch (NumberFormatException e) {
-            throw new BadRequestException("Latitude, longitude and available time must be numbers in double format");
+        } catch (Exception e) {
+            throw new BadRequestException("availableFrom, availableTo should be time in format HH:MM");
         }
     }
 }

@@ -3,7 +3,6 @@ package dev.morozan1.server.controller;
 import dev.morozan1.server.dto.request.CUProductRequestDto;
 import dev.morozan1.server.dto.response.ProductResponseDto;
 import dev.morozan1.server.entity.Product;
-import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.ProductService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;

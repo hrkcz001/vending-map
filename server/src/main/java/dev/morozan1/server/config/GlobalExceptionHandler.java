@@ -2,7 +2,6 @@ package dev.morozan1.server.config;
 
 import dev.morozan1.server.dto.response.ErrorResponseDto;
 import dev.morozan1.server.exception.BadRequestException;
-import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.exception.ForbiddenException;
 import dev.morozan1.server.exception.NotFoundException;
 import org.springframework.http.HttpStatus;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.validation.FieldError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -58,21 +58,12 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({ NoSuchElementException.class, NotFoundException.class })
+    @ExceptionHandler({ NoSuchElementException.class, NotFoundException.class, NoResourceFoundException.class })
     public ResponseEntity<ErrorResponseDto> handleNoSuchElementException(Exception e) {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.NOT_FOUND.value());
         errorResponseDto.setError(HttpStatus.NOT_FOUND.getReasonPhrase());
         return new ResponseEntity<>(errorResponseDto, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(BadIdException.class)
-    public ResponseEntity<ErrorResponseDto> handleNoIdException(BadIdException e) {
-        ErrorResponseDto errorResponseDto = new ErrorResponseDto();
-        errorResponseDto.setStatus(HttpStatus.BAD_REQUEST.value());
-        errorResponseDto.setError(HttpStatus.BAD_REQUEST.getReasonPhrase());
-        errorResponseDto.setReasons(List.of("Id is missing or can not be parsed to Long"));
-        return new ResponseEntity<>(errorResponseDto, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(ForbiddenException.class)
@@ -88,6 +79,7 @@ public class GlobalExceptionHandler {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponseDto.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
+        errorResponseDto.setReasons(List.of(e.toString()));
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

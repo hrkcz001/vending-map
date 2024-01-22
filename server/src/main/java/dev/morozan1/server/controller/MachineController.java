@@ -3,7 +3,6 @@ package dev.morozan1.server.controller;
 import dev.morozan1.server.dto.request.CUMachineRequestDto;
 import dev.morozan1.server.dto.response.MachineResponseDto;
 import dev.morozan1.server.entity.Machine;
-import dev.morozan1.server.exception.BadIdException;
 import dev.morozan1.server.service.MachineService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,8 +70,7 @@ public class MachineController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMachine(@PathVariable Long id) {
-        if (id == null) throw new BadIdException();
+    public ResponseEntity<Void> deleteMachine(@PathVariable long id) {
         machineService.deleteMachine(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
