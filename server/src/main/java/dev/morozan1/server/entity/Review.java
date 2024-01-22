@@ -24,7 +24,7 @@ public class Review {
     @Column(name = "RATING", nullable = false)
     private Short rating;
 
-    @Column(name = "COMMENT", length = 300)
+    @Column(name = "COMMENT", nullable = false)
     private String comment;
 
     public void setMachine(Machine machine) {
@@ -40,7 +40,8 @@ public class Review {
     }
 
     public void setComment(String comment) {
-        if (comment != null && comment.isBlank()) {
+        Objects.requireNonNull(comment, "Comment must not be null");
+        if (comment.isBlank()) {
             throw new IllegalArgumentException("Comment must not be whitespace-only");
         }
         this.comment = comment;

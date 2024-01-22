@@ -27,7 +27,7 @@ public class Machine {
     @Column(name = "LONGITUDE", nullable = false)
     private Double longitude;
 
-    @Column(name = "ADDRESS", nullable = false)
+    @Column(name = "ADDRESS", length = 50, nullable = false)
     private String address;
 
     @Column(name = "DESCRIPTION")

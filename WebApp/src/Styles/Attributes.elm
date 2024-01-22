@@ -3,16 +3,24 @@ module Styles.Attributes exposing
     , active
     , closeButton
     , entry
+    , floating
     , machineInfo
     , machineDetails
     , header
     , headerBackground
     , availableHours
+    , reviewsShowButton
+    , reviewsList
+    , reviewInputForm
+    , reviewInputComment
+    , reviewRating
+    , reviewSubmit
     , inputAddress
     , inputDetails
     , inputTimeFrom
     , inputTimeTo
     , insertButton
+    , thumbnail
     , rangeSlider
     , refreshButton
     , choosePointHint
@@ -128,23 +136,6 @@ choosePointHint =
     , Attributes.style "text-decoration" "none"
     ]
 
-
-regionInfo : List (Attribute msg)
-regionInfo =
-    [ Attributes.style "position" "absolute"
-    , Attributes.style "z-index" "2"
-    , Attributes.style "width" "20%"
-    , Attributes.style "height" "93%"
-    , Attributes.style "top" "7%"
-    , Attributes.style "left" "0%"
-    , Attributes.style "overflow" "auto"
-    , Attributes.style "background-color" "FloralWhite"
-    , Attributes.style "padding" "1rem"
-    , Attributes.style "box-sizing" "border-box"
-    , Attributes.style "border-right" "1px solid #000"
-    ]
-
-
 rangeSlider : List (Attribute msg)
 rangeSlider =
     [ Attributes.style "position" "absolute"
@@ -163,8 +154,8 @@ refreshButton =
     ]
 
 
-machineInfo : List (Attribute msg)
-machineInfo =
+floating : List (Attribute msg)
+floating =
     [ Attributes.style "position" "absolute"
     , Attributes.style "z-index" "2"
     , Attributes.style "width" "60%"
@@ -179,11 +170,94 @@ machineInfo =
     ]
 
 
+machineInfo : List (Attribute msg)
+machineInfo =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "50%"
+    , Attributes.style "height" "100%"
+    , Attributes.style "top" "0%"
+    , Attributes.style "left" "0%"
+    , Attributes.style "padding" "1rem"
+    , Attributes.style "overflow" "auto"
+    , Attributes.style "box-sizing" "border-box"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+
 machineDetails : List (Attribute msg)
 machineDetails =
     [ Attributes.style "position" "absolute"
     , Attributes.style "width" "50%"
     , Attributes.style "height" "100%"
+    ]
+
+
+reviewsShowButton : List (Attribute msg)
+reviewsShowButton =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "20%"
+    , Attributes.style "height" "5%"
+    , Attributes.style "top" "90%"
+    , Attributes.style "left" "5%"
+    , Attributes.style "cursor" "pointer"
+    , Attributes.style "color" "#000"
+    , Attributes.style "text-decoration" "none"
+    ]
+
+reviewsList : List (Attribute msg)
+reviewsList =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "70%"
+    , Attributes.style "height" "100%"
+    , Attributes.style "top" "0%"
+    , Attributes.style "left" "0%"
+    , Attributes.style "overflow" "auto"
+    , Attributes.style "background-color" "FloralWhite"
+    , Attributes.style "padding" "1rem"
+    , Attributes.style "box-sizing" "border-box"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+reviewInputForm : List (Attribute msg)
+reviewInputForm =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "30%"
+    , Attributes.style "height" "100%"
+    , Attributes.style "top" "0%"
+    , Attributes.style "left" "70%"
+    ]
+
+reviewInputComment : List (Attribute msg)
+reviewInputComment =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "resize" "none"
+    , Attributes.style "width" "90%"
+    , Attributes.style "height" "45%"
+    , Attributes.style "top" "10%"
+    , Attributes.style "left" "5%"
+    , Attributes.style "background-color" "#fff"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+
+reviewRating : List (Attribute msg)
+reviewRating =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "top" "70%"
+    , Attributes.style "left" "15%"
+    ]
+
+
+reviewSubmit : List (Attribute msg)
+reviewSubmit =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "20%"
+    , Attributes.style "height" "5%"
+    , Attributes.style "top" "90%"
+    , Attributes.style "left" "40%"
+    , Attributes.style "cursor" "pointer"
+    , Attributes.style "color" "#000"
+    , Attributes.style "text-decoration" "none"
     ]
 
 
@@ -244,6 +318,15 @@ insertingSubmit =
     , Attributes.style "cursor" "pointer"
     , Attributes.style "color" "#000"
     , Attributes.style "text-decoration" "none"
+    ]
+
+
+thumbnail : List (Attribute msg)
+thumbnail =
+    [ Attributes.style "width" "30%"
+    , Attributes.style "box-sizing" "border-box"
+    , Attributes.style "overflow" "hidden"
+    , Attributes.style "border" "1px solid #000"
     ]
 
 

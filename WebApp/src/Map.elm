@@ -1,6 +1,7 @@
 module Map exposing (Mode(..), Model, Msg(..), init, update, view)
 
 import Machine exposing (layersFromMachines, listenLayersFromMachines, sourcesFromMachines)
+import Products
 import Html exposing (Html, div)
 import Http
 import Json.Decode
@@ -36,6 +37,7 @@ import Machine exposing (selectedPointSource)
 type alias Model =
     { hoveredFeatures : List Json.Encode.Value
     , machineModel : Machine.Model
+    , productsModel : Products.Model
     , mode : Mode
     , about : String
     }
@@ -58,6 +60,7 @@ type Msg
     | Click EventData
     | SetMode Mode
     | MachineMsg Machine.Msg
+    | ProductsMsg Products.Msg
     | GotAbout (Result Http.Error String)
 
 
@@ -71,6 +74,7 @@ init =
     { hoveredFeatures = []
     , mode = Loading
     , machineModel = Machine.init
+    , productsModel = Products.init
     , about = "Loading..."
     }
 
@@ -132,13 +136,20 @@ update wrapMsg msg model =
             let
                 ( newModel, cmd ) =
                     case mode of
-                        Products -> ( model, Cmd.none )
+                        Products ->
+                                    let
+                                        ( newProductsModel, productsCmd ) = 
+                                            Products.update (wrapMsg << ProductsMsg) 
+                                            Products.RequestedProducts
+                                            model.productsModel
+                                    in
+                                    ({ model | productsModel = newProductsModel }, productsCmd)
 
                         Machines ->
                                     let
                                         ( newMachineModel, machineCmd ) = 
                                             Machine.update (wrapMsg << MachineMsg) 
-                                            Machine.MachinesRequested 
+                                            Machine.RequestedMachines
                                             model.machineModel
                                     in
                                     ({ model | machineModel = newMachineModel }, machineCmd)
@@ -160,6 +171,13 @@ update wrapMsg msg model =
                     Machine.update (wrapMsg << MachineMsg) machineMsg model.machineModel
             in
             ( { model | machineModel = newMachineModel }, cmd )
+        
+        ProductsMsg productsMsg ->
+            let
+                ( newProductsModel, cmd ) =
+                    Products.update (wrapMsg << ProductsMsg) productsMsg model.productsModel
+            in
+            ( { model | productsModel = newProductsModel }, cmd )
 
         GotAbout (Ok about) ->
             ( { model | about = about }, Cmd.none )
@@ -189,8 +207,7 @@ view wrapMsg model =
 
                 Machines -> Machine.view (wrapMsg << MachineMsg) model.machineModel
 
-                Products ->
-                    div [] []
+                Products -> Products.view (wrapMsg << ProductsMsg) model.productsModel
 
                 About ->
                     Html.div Styles.Attributes.about

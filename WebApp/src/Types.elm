@@ -12,5 +12,16 @@ type alias Machine =    { id : Int
                         }
 
 type alias Review = { rating : Int
-                    , comment : String
+                    , comment : Maybe String
                     }
+
+type alias Product = { id : Int
+                     , name : String
+                     , picture : Maybe String
+                     , averagePrice : Maybe Float
+                     }
+
+type alias ProductInMachine = { product : Product
+                              , isAvailable : Bool
+                              , price : Float
+                              }

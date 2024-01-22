@@ -8,6 +8,7 @@ import TimePicker exposing (TimeEvent(..), TimePicker, Time)
 
 import Styles.Attributes
 import Html exposing (time)
+import Html exposing (details)
 
 type alias Model =
     { insertedPoint : Maybe LngLat
@@ -100,17 +101,17 @@ view wrapMsg model =
                     [ Html.text "Cancel" ]
                 ]
         Just _ ->
-            Html.div Styles.Attributes.machineInfo
+            Html.div Styles.Attributes.floating
                 [ Html.input
                     (Styles.Attributes.inputAddress
-                        ++ [ Html.Attributes.placeholder "Address"
+                        ++ [ Html.Attributes.placeholder "Address, 50 characters max"
                            , Html.Events.onInput (wrapMsg << AddressInserted)
                            ]
                     )
                     []
                 , Html.textarea
                     (Styles.Attributes.inputDetails
-                        ++ [ Html.Attributes.placeholder "Details"
+                        ++ [ Html.Attributes.placeholder "Details, 300 characters max"
                            , Html.Events.onInput (wrapMsg << DetailsInserted)
                            ]
                     )
@@ -137,18 +138,34 @@ view wrapMsg model =
                 , Html.button
                     (Styles.Attributes.insertingSubmit
                         ++ [ Html.Attributes.disabled <|
-                                model.insertedAddress
-                                    == Nothing
-                                    || model.insertedAddress
-                                    == Just ""
-                                    || model.insertedDetails
-                                    == Just ""
+                                    addressNotValid model.insertedAddress
+                                    || detailsNotValid model.insertedDetails
                                     || timePeriodNotValid model.insertedTimeFrom model.insertedTimeTo
                            , Html.Events.onClick (wrapMsg InsertSubmitted)
                            ]
                     )
                     [ Html.text "Submit" ]
                 ]
+
+addressNotValid : Maybe String -> Bool
+addressNotValid maybeAddress =
+    case maybeAddress of
+        Nothing ->
+            True
+        Just "" ->
+            True
+        Just address ->
+            String.length address > 50
+
+detailsNotValid : Maybe String -> Bool
+detailsNotValid maybeDetails =
+    case maybeDetails of
+        Nothing ->
+            False
+        Just "" ->
+            True
+        Just details ->
+            String.length details > 255
 
 timePeriodNotValid : Maybe Time -> Maybe Time -> Bool
 timePeriodNotValid timeFrom timeTo =

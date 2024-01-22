@@ -7,6 +7,7 @@
     "dependencies": {
         "direct": {
             "EdutainmentLIVE/elm-dropdown": "1.0.0",
+            "FordLabs/elm-star-rating": "2.0.1",
             "NoRedInk/elm-json-decode-pipeline": "1.0.1",
             "carwow/elm-slider": "11.1.6",
             "elm/browser": "1.0.2",

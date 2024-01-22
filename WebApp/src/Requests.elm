@@ -3,6 +3,11 @@ module Requests exposing ( getMachines
                          , postMachine
                          , getReviews
                          , postReview
+                         , getProducts
+                         , postProduct
+                         , getProductsOfMachine
+                         , addProductToMachine
+                         , updateProductInMachine
                          , getAbout
                          )
 
@@ -10,7 +15,7 @@ import Http
 import Json.Decode
 import Json.Encode
 import LngLat exposing (LngLat)
-import Types exposing (Machine, Review)
+import Types exposing (Machine, Review, Product, ProductInMachine)
 import Time exposing (Month(..))
 
 getMachines : Maybe (LngLat, Float) -> (Result Http.Error (List Machine) -> msg) -> Cmd msg
@@ -85,6 +90,78 @@ postReview machineId review msg =
         , tracker = Nothing
         }
 
+getProducts : (Result Http.Error (List Product) -> msg) -> Cmd msg
+getProducts msg =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = "api/products"
+        , body = Http.emptyBody
+        , expect = Http.expectJson msg (Json.Decode.list productDecoder)
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
+postProduct : Product -> (Result Http.Error Product -> msg) -> Cmd msg
+postProduct product msg =
+    Http.request
+        { method = "POST"
+        , headers = []
+        , url = "api/products"
+        , body = Http.jsonBody <| productEncoder product
+        , expect = Http.expectJson msg productDecoder
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
+getProductsOfMachine : Int -> (Result Http.Error (List ProductInMachine) -> msg) -> Cmd msg
+getProductsOfMachine machineId msg =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = "api/machines/" ++ String.fromInt machineId ++ "/products"
+        , body = Http.emptyBody
+        , expect = Http.expectJson msg (Json.Decode.list productInMachineDecoder)
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
+addProductToMachine : Int -> ProductInMachine -> (Result Http.Error ProductInMachine -> msg) -> Cmd msg
+addProductToMachine machineId productInMachine msg =
+    Http.request
+        { method = "POST"
+        , headers = []
+        , url = "api/machines/" ++ String.fromInt machineId ++ "/products" ++ String.fromInt productInMachine.product.id
+        , body = Http.jsonBody <| productInMachineEncoder productInMachine
+        , expect = Http.expectJson msg productInMachineDecoder
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
+updateProductInMachine : Int -> ProductInMachine -> (Result Http.Error ProductInMachine -> msg) -> Cmd msg
+updateProductInMachine machineId productInMachine msg =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = "api/machines/" ++ String.fromInt machineId ++ "/products" ++ String.fromInt productInMachine.product.id
+        , body = Http.jsonBody <| productInMachineEncoder productInMachine
+        , expect = Http.expectJson msg productInMachineDecoder
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
+getAbout : (Result Http.Error String -> msg) -> Cmd msg
+getAbout msg =
+    Http.request
+        { method = "GET"
+        , headers = []
+        , url = "static/about.txt"
+        , body = Http.emptyBody
+        , expect = Http.expectString msg
+        , timeout = Just 10000
+        , tracker = Nothing
+        }
+
 nullable : (a -> Json.Encode.Value) -> Maybe a -> Json.Encode.Value
 nullable encoder value =
     Maybe.withDefault Json.Encode.null (Maybe.map encoder value)
@@ -150,22 +227,49 @@ reviewDecoder =
         , comment = comment
         })
         (Json.Decode.field "rating" Json.Decode.int)
-        (Json.Decode.field "comment" Json.Decode.string)
+        (Json.Decode.field "comment" (Json.Decode.nullable Json.Decode.string))
 
 reviewEncoder : Review -> Json.Encode.Value
 reviewEncoder review =
     Json.Encode.object
         [ ( "rating", Json.Encode.int review.rating )
-        , ( "comment", Json.Encode.string review.comment )
+        , ( "comment", nullable Json.Encode.string review.comment )
         ]
-getAbout : (Result Http.Error String -> msg) -> Cmd msg
-getAbout msg =
-    Http.request
-        { method = "GET"
-        , headers = []
-        , url = "static/about.txt"
-        , body = Http.emptyBody
-        , expect = Http.expectString msg
-        , timeout = Just 10000
-        , tracker = Nothing
-        }
+
+productDecoder : Json.Decode.Decoder Product
+productDecoder =
+    Json.Decode.map4 (\id name picture averagePrice -> 
+        { id = id
+        , name = name
+        , picture = picture
+        , averagePrice = averagePrice
+        })
+        (Json.Decode.field "productId" Json.Decode.int)
+        (Json.Decode.field "name" Json.Decode.string)
+        (Json.Decode.field "picture" (Json.Decode.nullable Json.Decode.string))
+        (Json.Decode.field "averagePrice" (Json.Decode.nullable Json.Decode.float))
+
+productEncoder : Product -> Json.Encode.Value
+productEncoder product =
+    Json.Encode.object
+        [ ( "name", Json.Encode.string product.name )
+        , ( "picture", nullable Json.Encode.string product.picture )
+        ]
+
+productInMachineDecoder : Json.Decode.Decoder ProductInMachine
+productInMachineDecoder =
+    Json.Decode.map3 (\product isAvailable price -> 
+        { product = product
+        , isAvailable = isAvailable
+        , price = price
+        })
+        (Json.Decode.field "product" productDecoder)
+        (Json.Decode.field "isAvailable" Json.Decode.bool)
+        (Json.Decode.field "price" Json.Decode.float)
+
+productInMachineEncoder : ProductInMachine -> Json.Encode.Value
+productInMachineEncoder productInMachine =
+    Json.Encode.object
+        [ ( "isAvailable", Json.Encode.bool productInMachine.isAvailable )
+        , ( "price", Json.Encode.float productInMachine.price )
+        ]

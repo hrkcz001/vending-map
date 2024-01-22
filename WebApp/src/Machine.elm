@@ -40,7 +40,7 @@ type alias Model = { machines : List Machine
                    , infoModel : Maybe MachineInfo.Model
                    }
 
-type Msg = MachinesRequested
+type Msg = RequestedMachines
          | GotMachines (Result Http.Error (List Machine))
          | GotMachine (Result Http.Error Machine)
          | RangeChanged Float
@@ -84,8 +84,8 @@ update wrapMsg msg model =
         selectedArea = Maybe.map2 (\point radius -> (point, radius)) model.selectedPoint model.selectedRadius
     in
     case msg of
-        MachinesRequested ->
-            ( { model | infoModel = Nothing, insertModel = Nothing }, getMachines selectedArea(wrapMsg << GotMachines) )
+        RequestedMachines ->
+            ( { model | infoModel = Nothing, insertModel = Nothing }, getMachines selectedArea (wrapMsg << GotMachines) )
 
         GotMachines (Ok machines) ->
             ( { model | machines = machines }, Cmd.none )
@@ -354,7 +354,7 @@ view wrapMsg model =
                 refreshButton =
                     Html.button
                         (Styles.Attributes.refreshButton
-                            ++ [ Html.Events.onClick (wrapMsg MachinesRequested) ]
+                            ++ [ Html.Events.onClick (wrapMsg RequestedMachines) ]
                         )
                         [ Html.text "Refresh" ]
 
