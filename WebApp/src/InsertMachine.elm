@@ -100,9 +100,9 @@ view wrapMsg model =
                     [ Html.text "Cancel" ]
                 ]
         Just _ ->
-            Html.div Styles.Attributes.eventInfo
+            Html.div Styles.Attributes.machineInfo
                 [ Html.input
-                    (Styles.Attributes.inputName
+                    (Styles.Attributes.inputAddress
                         ++ [ Html.Attributes.placeholder "Address"
                            , Html.Events.onInput (wrapMsg << AddressInserted)
                            ]
@@ -115,11 +115,17 @@ view wrapMsg model =
                            ]
                     )
                     []
-                , Html.h3 []
-                    [ Html.text "Available hours" ]
-                , Html.div [ Html.Attributes.placeholder "From" ]
+                , Html.div Styles.Attributes.availableHours
+                    [ Html.text "Available hours"
+                    , Html.br [] [], Html.br [] []
+                    , Html.text "From:"
+                    , Html.br [] [], Html.br [] []
+                    , Html.text "To:" ]
+                , Html.div (Styles.Attributes.inputTimeFrom ++
+                            [ Html.Attributes.class "default-time-picker" ])
                 [ Html.map (wrapMsg << FromTimeMsg) <| TimePicker.view steppingSettings model.timeFromPicker ]
-                , Html.div [ Html.Attributes.placeholder "To" ]
+                , Html.div (Styles.Attributes.inputTimeTo ++
+                            [ Html.Attributes.class "default-time-picker" ])
                 [ Html.map (wrapMsg << ToTimeMsg) <| TimePicker.view steppingSettings model.timeToPicker ]
                 , Html.button
                     (Styles.Attributes.closeButton

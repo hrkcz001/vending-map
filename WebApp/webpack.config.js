@@ -49,6 +49,7 @@ module.exports = {
               tags: [
                 'mapbox-gl.js',
                 'mapbox-gl.css',
+                'elm-time-picker.css'
               ],
             })
     ]

@@ -1,9 +1,14 @@
-module Machine exposing ( Machine
-                        , Review
+module Machine exposing ( Model
+                        , Msg(..)
+                        , init
+                        , update
+                        , view
+                        , selectedPointSource
+                        , selectedPointLayer
                         , layersFromMachines
                         , listenLayersFromMachines
                         , sourcesFromMachines
-                        , viewMachineInfo)
+                        )
 
 import Html exposing (Html)
 import Html.Events
@@ -14,25 +19,217 @@ import Mapbox.Layer as Layer
 import Mapbox.Source as Source
 import Styles.Attributes
 import LngLat exposing (LngLat)
+import InsertMachine
+import Http
+import Types exposing (Machine)
+import Requests exposing (getMachines, postMachine)
+import TimePicker exposing (Time)
+import SingleSlider exposing (..)
 
 
 
 --| An event on the map
 --| id is String because it is used as name for features
 
+type alias Model = { machines : List Machine
+                   , selectedMachine : Maybe Machine
+                   , selectedRadius : Maybe Float
+                   , selectedPoint : Maybe LngLat
+                   , rangeSlider : SingleSlider.SingleSlider Msg
+                   , insertModel : Maybe InsertMachine.Model
+                   }
 
-type alias Machine =    { id : Int
-                        , coord : LngLat
-                        , address : String
-                        , description : Maybe String
-                        , rating : Maybe Float
-                        , reviewsCount : Int
-                        , availableTime : Maybe (String, String)
-                        }
+type Msg = MachinesRequested
+         | GotMachines (Result Http.Error (List Machine))
+         | GotMachine (Result Http.Error Machine)
+         | RangeChanged Float
+         | MapClicked (String, String, LngLat)
+         | MachineInfoClosed
+         | InsertModeEntered
+         | InsertMachineMsg InsertMachine.Msg
 
-type alias Review = { rating : Int
-                    , comment : String
+
+init : Model
+init = 
+    let
+        nullFormatter =
+            \_ -> ""
+        
+        valueFormatter =
+            \fst _ -> "0 - " ++ String.fromFloat fst ++ " m"
+
+    in
+        { machines = []
+        , selectedMachine = Nothing
+        , selectedRadius = Nothing
+        , selectedPoint = Nothing
+        , rangeSlider = SingleSlider.init
+                            { min = 100
+                            , max = 10000
+                            , value = 10000
+                            , step = 50
+                            , onChange = RangeChanged
+                            }
+                            |> SingleSlider.withMinFormatter nullFormatter
+                            |> SingleSlider.withMaxFormatter nullFormatter
+                            |> SingleSlider.withValueFormatter valueFormatter
+        , insertModel = Nothing
+        }
+
+
+update : (Msg -> msg) -> Msg -> Model -> (Model, Cmd msg)
+update wrapMsg msg model = 
+    let
+        selectedArea = Maybe.map2 (\point radius -> (point, radius)) model.selectedPoint model.selectedRadius
+    in
+    case msg of
+        MachinesRequested ->
+            ( { model | selectedMachine = Nothing, insertModel = Nothing }, getMachines selectedArea(wrapMsg << GotMachines) )
+
+        GotMachines (Ok machines) ->
+            ( { model | machines = machines }, Cmd.none )
+        
+        GotMachines (Err _) ->
+            ( model, Cmd.none )
+
+        GotMachine (Ok machineInfo) ->
+            ( { model | selectedMachine = Just machineInfo }, getMachines selectedArea (wrapMsg << GotMachines) )
+
+        GotMachine (Err _) ->
+            ( { model | selectedMachine = Nothing }, Cmd.none )
+
+        RangeChanged radius ->
+            let
+                newSlider = SingleSlider.update radius model.rangeSlider
+
+            in
+            ( { model | rangeSlider = newSlider, selectedRadius = Just radius }, Cmd.none)
+
+        MapClicked (featType, featName, lngLat) -> 
+                            case ( featType, String.toInt featName ) of
+                                ( "machine", Just id ) ->
+                                    ( { model | insertModel = Nothing }, Requests.getMachine id (wrapMsg << GotMachine))
+                                _ ->
+                                    case model.insertModel of
+                                        Just insertModel ->
+                                            ( { model | insertModel = (
+                                                Just <|
+                                                InsertMachine.update
+                                                    (InsertMachine.PointChoosed (Just lngLat))
+                                                    insertModel
+                                            )}, Cmd.none )
+
+                                        Nothing ->
+                                                    if model.selectedMachine == Nothing then
+                                                        ( { model | selectedPoint = Just lngLat }, Cmd.none )
+                                                    else
+                                                        ( { model | selectedMachine = Nothing }, Cmd.none )
+
+
+        MachineInfoClosed ->
+            ( { model | selectedMachine = Nothing }, Cmd.none )
+
+        InsertModeEntered ->
+            ( { model | selectedMachine = Nothing, insertModel = Just InsertMachine.init }, Cmd.none )
+
+        InsertMachineMsg insertMsg ->
+            case insertMsg of
+                InsertMachine.InsertCancelled ->
+                    ( { model | insertModel = Nothing }, Cmd.none )
+
+                InsertMachine.InsertSubmitted ->
+                    case model.insertModel of
+                        Just insertModel ->
+                            case ( insertModel.insertedPoint
+                                 , insertModel.insertedAddress ) of
+                                ( Just point, Just address ) ->
+                                    let timePeriod =
+                                            case ( insertModel.insertedTimeFrom
+                                                 , insertModel.insertedTimeTo ) of
+                                                ( Just from, Just to ) ->
+                                                    Just <| timePeriodToString (from, to)
+
+                                                _ ->
+                                                    Nothing
+                                        machine = Machine -1 point address insertModel.insertedDetails Nothing 0 timePeriod
+                                    in
+                                    ( { model | insertModel = Nothing }, postMachine machine (wrapMsg << GotMachine)
+                                    )
+                                _ ->
+                                    ( model, Cmd.none )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+                _ ->
+                    case model.insertModel of
+                        Just insertModel ->
+                            let
+                                newInsertModel =
+                                    InsertMachine.update insertMsg insertModel
+                            in
+                            ( { model | insertModel = Just newInsertModel }, Cmd.none )
+
+                        Nothing ->
+                            ( model, Cmd.none )
+
+timePeriodToString : (Time, Time) -> (String, String)
+timePeriodToString (from, to) =
+    let addZero n = if n < 10 then "0" ++ (String.fromInt n) else String.fromInt n
+        fromString = addZero from.hours ++ ":" ++ addZero from.minutes
+        toString = addZero to.hours ++ ":" ++ addZero to.minutes
+    in
+    (fromString, toString)
+
+
+selectedPointSource : Model -> List Source.Source
+selectedPointSource model =
+    let
+        pointToFeature maybePoint =
+            case maybePoint of
+                Just point ->
+                    """
+                    {
+                    "type": "Feature",
+                    "properties": {
+                        "name": "selectedPoint"
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [""" ++ String.fromFloat point.lng ++ ", " ++ String.fromFloat point.lat ++ """]
                     }
+                    }
+                    """
+                Nothing ->
+                    ""
+    in
+    Json.Decode.decodeString Json.Decode.value ("""
+        {
+          "type": "FeatureCollection",
+          "features": [
+              """ ++ pointToFeature model.selectedPoint ++ """
+           ]
+        }
+        """) |> Result.withDefault (Json.Encode.object [])
+        |> Source.geoJSONFromValue "selectedPoint" [ Source.generateIds ]
+        |> List.singleton
+    
+
+
+selectedPointLayer : Model -> List Layer.Layer
+selectedPointLayer model =
+    case model.selectedPoint of
+        Just _ ->
+            [ Layer.circle "selectedPoint" "selectedPoint"
+                [ Layer.circleRadius (E.float 5)
+                , Layer.circleColor (E.rgba 255 0 0 255)
+                , Layer.circleStrokeColor (E.rgba 0 0 0 255)
+                , Layer.circleStrokeWidth (E.float 1)
+                ]
+            ]
+
+        Nothing ->
+            []
 
 
 --| Information about an event
@@ -41,8 +238,8 @@ type alias Review = { rating : Int
 --| The sources are used to create layers
 
 
-sourcesFromMachines : List Machine -> List Source.Source
-sourcesFromMachines machines =
+sourcesFromMachines : Model -> List Source.Source
+sourcesFromMachines model =
     let
         coords machine =
             "[" ++ String.fromFloat machine.coord.lng ++ ", " ++ String.fromFloat machine.coord.lat ++ "]"
@@ -61,7 +258,7 @@ sourcesFromMachines machines =
             }
             """
     in
-    List.map machineToFeature machines
+    List.map machineToFeature model.machines
         |> String.join ","
         |> (\features -> Json.Decode.decodeString Json.Decode.value ("""
         {
@@ -75,60 +272,95 @@ sourcesFromMachines machines =
         |> List.singleton
 
 
-
 --| Create a list of layers from a list of events
 --| creates a circle layer for each event
 --| hover effect by changing opacity
 
 
-layersFromMachines : List Machine -> List Layer.Layer
-layersFromMachines machines =
+layersFromMachines : Model -> List Layer.Layer
+layersFromMachines model =
     List.map
         (\machine ->
             Layer.circle ("machine." ++ String.fromInt machine.id)
                 "machines"
                 [ Layer.circleRadius (E.float 10)
-                , Layer.circleColor (E.rgba 0 150 255 255)
+                , Layer.circleColor (E.ifElse (E.toBool (E.featureState (E.str "hover")))
+                    (E.rgba 100 255 100 255)
+                    (E.rgba 0 150 255 255)
+                )
                 , Layer.circleStrokeColor (E.rgba 0 0 0 255)
                 , Layer.circleStrokeWidth (E.float 1)
-                , Layer.circleOpacity
-                    (E.ifElse (E.toBool (E.featureState (E.str "hover")))
-                        (E.float 0.7)
-                        (E.float 0.2)
-                    )
+                , Layer.circleOpacity (E.float 0.5)
                 ]
         )
-        machines
+        model.machines
 
 
 
 --| Create a list of layer names from a list of events
 
 
-listenLayersFromMachines : List Machine -> List String
-listenLayersFromMachines machines =
-    List.map (\machine -> "machine." ++ String.fromInt machine.id) machines
+listenLayersFromMachines : Model -> List String
+listenLayersFromMachines model =
+    List.map (\machine -> "machine." ++ String.fromInt machine.id) model.machines
 
 
 
 --| View for the event info
 
 
-viewMachineInfo : msg -> Maybe Machine -> Html msg
-viewMachineInfo mapMsg machineInfo =
-    case machineInfo of
+view : (Msg -> msg) -> Model -> Html msg
+view wrapMsg model =
+            let 
+                insertButton =
+                    if model.insertModel == Nothing then
+                        Html.button
+                            (Styles.Attributes.insertButton
+                                ++ [ Html.Events.onClick (wrapMsg InsertModeEntered) ]
+                            )
+                            [ Html.text "Add Machine" ]
+                    else
+                        Html.div [] []
+
+                insertForm =
+                    case model.insertModel of
+                        Just insertModel ->
+                            InsertMachine.view (wrapMsg << InsertMachineMsg) insertModel
+
+                        Nothing ->
+                            Html.div [] []
+                
+                rangeSlider =
+                    Html.div Styles.Attributes.rangeSlider
+                        [ Html.div [] [ Html.text "Radius: " ]
+                        , Html.map wrapMsg <| SingleSlider.view model.rangeSlider
+                        ]
+
+                refreshButton =
+                    Html.button
+                        (Styles.Attributes.refreshButton
+                            ++ [ Html.Events.onClick (wrapMsg MachinesRequested) ]
+                        )
+                        [ Html.text "Refresh" ]
+
+            in
+    case model.selectedMachine of
         Nothing ->
-            Html.div [] []
+            case model.insertModel of
+                Just _ ->
+                    Html.div [] [ insertForm, insertButton ]
+
+                Nothing -> Html.div [] [ rangeSlider, refreshButton, insertButton ]
 
         Just info ->
-            Html.div Styles.Attributes.eventInfo
+            Html.div Styles.Attributes.machineInfo
                 [ Html.h2 [] [ Html.text info.address ]
                 , Maybe.withDefault (Html.div [] []) 
                     <| Maybe.map (\description -> Html.p [] [ Html.text description ]) info.description
                 
                 , Html.button
                     (Styles.Attributes.closeButton
-                        ++ [ Html.Events.onClick mapMsg ]
+                        ++ [ Html.Events.onClick (wrapMsg MachineInfoClosed) ]
                     )
                     [ Html.text "X" ]
                 ]

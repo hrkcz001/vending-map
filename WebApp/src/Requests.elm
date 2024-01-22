@@ -10,19 +10,19 @@ import Http
 import Json.Decode
 import Json.Encode
 import LngLat exposing (LngLat)
-import Machine exposing (Machine, Review)
+import Types exposing (Machine, Review)
 import Time exposing (Month(..))
 
-getMachines : Maybe { center : LngLat, radius : Float } -> (Result Http.Error (List Machine) -> msg) -> Cmd msg
-getMachines radius msg =
+getMachines : Maybe (LngLat, Float) -> (Result Http.Error (List Machine) -> msg) -> Cmd msg
+getMachines inRadius msg =
     let
         url =
-            case radius of
-                Just r ->
+            case inRadius of
+                Just (center, radius) ->
                     "api/machines?latitude=" ++
-                    String.fromFloat r.center.lat ++ 
-                    "&longitude=" ++ String.fromFloat r.center.lng ++ 
-                    "&radius=" ++ String.fromFloat r.radius
+                    String.fromFloat center.lat ++ 
+                    "&longitude=" ++ String.fromFloat center.lng ++ 
+                    "&radius=" ++ String.fromFloat radius
 
                 Nothing ->
                     "api/machines"
@@ -158,8 +158,6 @@ reviewEncoder review =
         [ ( "rating", Json.Encode.int review.rating )
         , ( "comment", Json.Encode.string review.comment )
         ]
-
-
 getAbout : (Result Http.Error String -> msg) -> Cmd msg
 getAbout msg =
     Http.request

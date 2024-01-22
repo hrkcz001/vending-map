@@ -185,7 +185,7 @@ view model =
                     (Styles.Attributes.titleName
                         ++ [ onClick <| GoTo "/map" ]
                     )
-                    [ Html.text "Prague Air Quality" ]
+                    [ Html.text "Vending Map" ]
                 , Html.div Styles.Attributes.header
                     [ Html.div
                         (entryStyles.map
@@ -194,9 +194,9 @@ view model =
                         [ Html.text "Map" ]
                     , Html.div
                         (entryStyles.events
-                            ++ [ onClick <| GoTo "/events" ]
+                            ++ [ onClick <| GoTo "/products" ]
                         )
-                        [ Html.text "Events" ]
+                        [ Html.text "Products" ]
                     , Html.div
                         (entryStyles.about
                             ++ [ onClick <| GoTo "/about" ]
@@ -223,6 +223,6 @@ view model =
                         [ Html.h1 [] [ Html.text "Not Found" ]
                         ]
     in
-    { title = "Prague Air Quality"
+    { title = "Vending Map"
     , body = [ header, content ]
     }

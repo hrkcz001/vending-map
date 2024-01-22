@@ -3,16 +3,21 @@ module Styles.Attributes exposing
     , active
     , closeButton
     , entry
-    , eventInfo
+    , machineInfo
+    , machineDetails
     , header
     , headerBackground
+    , availableHours
+    , inputAddress
     , inputDetails
-    , inputName
+    , inputTimeFrom
+    , inputTimeTo
     , insertButton
+    , rangeSlider
+    , refreshButton
     , choosePointHint
     , insertingSubmit
     , map
-    , regionInfo
     , titleName
     )
 
@@ -140,8 +145,26 @@ regionInfo =
     ]
 
 
-eventInfo : List (Attribute msg)
-eventInfo =
+rangeSlider : List (Attribute msg)
+rangeSlider =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "z-index" "2"
+    , Attributes.style "top" "8%"
+    , Attributes.style "left" "1%"
+    ]
+
+refreshButton : List (Attribute msg)
+refreshButton =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "z-index" "2"
+    , Attributes.style "top" "8%"
+    , Attributes.style "left" "5%"
+    , Attributes.style "cursor" "pointer"
+    ]
+
+
+machineInfo : List (Attribute msg)
+machineInfo =
     [ Attributes.style "position" "absolute"
     , Attributes.style "z-index" "2"
     , Attributes.style "width" "60%"
@@ -156,20 +179,16 @@ eventInfo =
     ]
 
 
-inputDetails : List (Attribute msg)
-inputDetails =
+machineDetails : List (Attribute msg)
+machineDetails =
     [ Attributes.style "position" "absolute"
-    , Attributes.style "width" "80%"
-    , Attributes.style "height" "60%"
-    , Attributes.style "top" "25%"
-    , Attributes.style "left" "10%"
-    , Attributes.style "background-color" "#fff"
-    , Attributes.style "border" "1px solid #000"
+    , Attributes.style "width" "50%"
+    , Attributes.style "height" "100%"
     ]
 
 
-inputName : List (Attribute msg)
-inputName =
+inputAddress : List (Attribute msg)
+inputAddress =
     [ Attributes.style "position" "absolute"
     , Attributes.style "width" "30%"
     , Attributes.style "height" "5%"
@@ -177,6 +196,41 @@ inputName =
     , Attributes.style "left" "10%"
     , Attributes.style "background-color" "#fff"
     , Attributes.style "border" "1px solid #000"
+    ]
+
+
+inputDetails : List (Attribute msg)
+inputDetails =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "resize" "none"
+    , Attributes.style "width" "80%"
+    , Attributes.style "height" "40%"
+    , Attributes.style "top" "15%"
+    , Attributes.style "left" "10%"
+    , Attributes.style "background-color" "#fff"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+availableHours : List (Attribute msg)
+availableHours =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "top" "60%"
+    , Attributes.style "left" "10%"
+    ]
+
+
+inputTimeFrom : List (Attribute msg)
+inputTimeFrom =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "top" "67%"
+    , Attributes.style "left" "17%"
+    ]
+
+inputTimeTo : List (Attribute msg)
+inputTimeTo =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "top" "77%"
+    , Attributes.style "left" "17%"
     ]
 
 

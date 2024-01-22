@@ -1,8 +1,7 @@
 module Map exposing (Mode(..), Model, Msg(..), init, update, view)
 
-import Machine exposing (..)
-import Html exposing (Html, div, text)
-import Html.Events
+import Machine exposing (layersFromMachines, listenLayersFromMachines, sourcesFromMachines)
+import Html exposing (Html, div)
 import Http
 import Json.Decode
 import Json.Encode
@@ -10,12 +9,11 @@ import LngLat exposing (LngLat)
 import Mapbox.Element exposing (..)
 import Mapbox.Source as Source
 import Mapbox.Style as Style exposing (Style(..))
-import Requests
+import Requests exposing (getAbout)
 import Styles.Attributes
 import Styles.Streets exposing (styleLayers)
-
-import InsertMachine
-import TimePicker exposing (Time)
+import Machine exposing (selectedPointLayer)
+import Machine exposing (selectedPointSource)
 
 
 {-| The model of the map
@@ -37,10 +35,8 @@ import TimePicker exposing (Time)
 -}
 type alias Model =
     { hoveredFeatures : List Json.Encode.Value
+    , machineModel : Machine.Model
     , mode : Mode
-    , machines : List Machine
-    , selectedMachine : Maybe Machine
-    , insertModel : Maybe InsertMachine.Model
     , about : String
     }
 
@@ -61,11 +57,7 @@ type Msg
     | MovedOut EventData
     | Click EventData
     | SetMode Mode
-    | GotMachines (Result Http.Error (List Machine))
-    | GotMachine (Result Http.Error Machine)
-    | MachineInfoClosed
-    | InsertModeEntered
-    | InsertMachineMsg InsertMachine.Msg
+    | MachineMsg Machine.Msg
     | GotAbout (Result Http.Error String)
 
 
@@ -78,12 +70,9 @@ init : Model
 init =
     { hoveredFeatures = []
     , mode = Loading
-    , machines = []
-    , selectedMachine = Nothing
-    , insertModel = Nothing
+    , machineModel = Machine.init
     , about = "Loading..."
     }
-    
 
 
 
@@ -128,23 +117,12 @@ update wrapMsg msg model =
 
                 ( newModel,  cmd ) =
                     case model.mode of
-                        Machines ->
-                            case ( featType, String.toInt featName ) of
-                                ( "machine", Just id ) ->
-                                    ( { model | insertModel = Nothing }, Requests.getMachine id (wrapMsg << GotMachine))
-                                _ ->
-                                    case model.insertModel of
-                                        Just insertModel ->
-                                            ( { model | insertModel = (
-                                                Just <|
-                                                InsertMachine.update
-                                                    (InsertMachine.PointChoosed (Just lngLat))
-                                                    insertModel
-                                            )}, Cmd.none )
-
-                                        Nothing ->
-                                            ( { model | selectedMachine = Nothing }, Cmd.none )
-
+                        Machines -> let
+                                        ( newMachineModel, machineCmd ) = Machine.update (wrapMsg << MachineMsg) 
+                                                                        (Machine.MapClicked (featType, featName, lngLat))
+                                                                        model.machineModel
+                                    in
+                                    ({ model | machineModel = newMachineModel }, machineCmd)
                         _ ->
                             ( model, Cmd.none)
             in
@@ -157,78 +135,31 @@ update wrapMsg msg model =
                         Products -> ( model, Cmd.none )
 
                         Machines ->
-                            ( model, Requests.getMachines Nothing (wrapMsg << GotMachines) )
+                                    let
+                                        ( newMachineModel, machineCmd ) = 
+                                            Machine.update (wrapMsg << MachineMsg) 
+                                            Machine.MachinesRequested 
+                                            model.machineModel
+                                    in
+                                    ({ model | machineModel = newMachineModel }, machineCmd)
 
                         About ->
                             ( { model | about = "Loading..."
-                            }, Requests.getAbout (wrapMsg << GotAbout) )
+                            }, getAbout (wrapMsg << GotAbout) )
                         
                         _ ->
                             ( model, Cmd.none )
             in
             ( { newModel | mode = mode
                          , hoveredFeatures = []
-                         , insertModel = Nothing
             }, cmd )
 
-        GotMachines (Ok machines) ->
-            ( { model | machines = machines }, Cmd.none )
-        
-        GotMachines (Err _) ->
-            ( model, Cmd.none )
-
-        GotMachine (Ok machineInfo) ->
-            ( { model | selectedMachine = Just machineInfo }, Cmd.none )
-
-        GotMachine (Err _) ->
-            ( { model | selectedMachine = Nothing }, Cmd.none )
-
-        MachineInfoClosed ->
-            ( { model | selectedMachine = Nothing }, Cmd.none )
-
-        InsertModeEntered ->
-            ( { model | selectedMachine = Nothing, insertModel = Just InsertMachine.init }, Cmd.none )
-
-        InsertMachineMsg insertMsg ->
-            case insertMsg of
-                InsertMachine.InsertCancelled ->
-                    ( { model | insertModel = Nothing }, Cmd.none )
-
-                InsertMachine.InsertSubmitted ->
-                    case model.insertModel of
-                        Just insertModel ->
-                            case ( insertModel.insertedPoint
-                                 , insertModel.insertedAddress ) of
-                                ( Just point, Just address ) ->
-                                    let timePeriod =
-                                            case ( insertModel.insertedTimeFrom
-                                                 , insertModel.insertedTimeTo ) of
-                                                ( Just from, Just to ) ->
-                                                    Just <| timePeriodToString (from, to)
-
-                                                _ ->
-                                                    Nothing
-                                        machine = Machine -1 point address insertModel.insertedDetails Nothing 0 timePeriod
-                                    in
-                                    ( { model | insertModel = Nothing }, Requests.postMachine machine (wrapMsg << GotMachine)
-                                    )
-                                _ ->
-                                    ( model, Cmd.none )
-
-                        Nothing ->
-                            ( model, Cmd.none )
-
-                _ ->
-                    case model.insertModel of
-                        Just insertModel ->
-                            let
-                                newInsertModel =
-                                    InsertMachine.update insertMsg insertModel
-                            in
-                            ( { model | insertModel = Just newInsertModel }, Cmd.none )
-
-                        Nothing ->
-                            ( model, Cmd.none )
+        MachineMsg machineMsg ->
+            let
+                ( newMachineModel, cmd ) =
+                    Machine.update (wrapMsg << MachineMsg) machineMsg model.machineModel
+            in
+            ( { model | machineModel = newMachineModel }, cmd )
 
         GotAbout (Ok about) ->
             ( { model | about = about }, Cmd.none )
@@ -236,14 +167,6 @@ update wrapMsg msg model =
         GotAbout (Err _) ->
             ( model, Cmd.none )
 
-
-timePeriodToString : (Time, Time) -> (String, String)
-timePeriodToString (from, to) =
-    let addZero n = if n < 10 then "0" ++ (String.fromInt n) else String.fromInt n
-        fromString = addZero from.hours ++ ":" ++ addZero from.minutes
-        toString = addZero to.hours ++ ":" ++ addZero to.minutes
-    in
-    (fromString, toString)
 
 --| change state of hovered features on the map
 
@@ -264,8 +187,7 @@ view wrapMsg model =
                 Loading ->
                     div [] []
 
-                Machines ->
-                    viewMachineInfo (wrapMsg MachineInfoClosed) model.selectedMachine
+                Machines -> Machine.view (wrapMsg << MachineMsg) model.machineModel
 
                 Products ->
                     div [] []
@@ -276,30 +198,11 @@ view wrapMsg model =
                         ]
 
         --| button to start inserting a new event
-        insertButton =
-            if model.mode == Machines && model.insertModel == Nothing then
-                Html.button
-                    (Styles.Attributes.insertButton
-                        ++ [ Html.Events.onClick (wrapMsg InsertModeEntered) ]
-                    )
-                    [ text "Add Machine" ]
-            else
-                Html.div [] []
-
-        insertForm =
-            case model.insertModel of
-                Just insertModel ->
-                    InsertMachine.view (wrapMsg << InsertMachineMsg) insertModel
-
-                Nothing ->
-                    Html.div [] []
 
     in
     div []
         [viewMap wrapMsg model
         , content
-        , insertButton
-        , insertForm
         ]
 
 
@@ -316,7 +219,8 @@ viewMap wrapMsg model =
             case model.mode of
 
                 Machines ->
-                    layersFromMachines model.machines
+                    layersFromMachines model.machineModel ++
+                    selectedPointLayer model.machineModel
 
                 _ ->
                     []
@@ -325,7 +229,7 @@ viewMap wrapMsg model =
         modeListenLayers =
             case model.mode of
                 Machines ->
-                    listenLayersFromMachines model.machines
+                    listenLayersFromMachines model.machineModel
 
                 _ ->
                     []
@@ -335,7 +239,8 @@ viewMap wrapMsg model =
             case model.mode of
                 
                 Machines ->
-                    sourcesFromMachines model.machines
+                    sourcesFromMachines model.machineModel ++
+                    selectedPointSource model.machineModel
 
                 _ ->
                     []
