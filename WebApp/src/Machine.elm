@@ -25,6 +25,7 @@ import Types exposing (Machine)
 import Requests exposing (getMachines, postMachine)
 import TimePicker exposing (Time)
 import SingleSlider exposing (..)
+import MachineInfo
 
 
 
@@ -32,11 +33,11 @@ import SingleSlider exposing (..)
 --| id is String because it is used as name for features
 
 type alias Model = { machines : List Machine
-                   , selectedMachine : Maybe Machine
                    , selectedRadius : Maybe Float
                    , selectedPoint : Maybe LngLat
                    , rangeSlider : SingleSlider.SingleSlider Msg
                    , insertModel : Maybe InsertMachine.Model
+                   , infoModel : Maybe MachineInfo.Model
                    }
 
 type Msg = MachinesRequested
@@ -44,7 +45,7 @@ type Msg = MachinesRequested
          | GotMachine (Result Http.Error Machine)
          | RangeChanged Float
          | MapClicked (String, String, LngLat)
-         | MachineInfoClosed
+         | MachineInfoMsg MachineInfo.Msg
          | InsertModeEntered
          | InsertMachineMsg InsertMachine.Msg
 
@@ -60,7 +61,6 @@ init =
 
     in
         { machines = []
-        , selectedMachine = Nothing
         , selectedRadius = Nothing
         , selectedPoint = Nothing
         , rangeSlider = SingleSlider.init
@@ -74,6 +74,7 @@ init =
                             |> SingleSlider.withMaxFormatter nullFormatter
                             |> SingleSlider.withValueFormatter valueFormatter
         , insertModel = Nothing
+        , infoModel = Nothing
         }
 
 
@@ -84,7 +85,7 @@ update wrapMsg msg model =
     in
     case msg of
         MachinesRequested ->
-            ( { model | selectedMachine = Nothing, insertModel = Nothing }, getMachines selectedArea(wrapMsg << GotMachines) )
+            ( { model | infoModel = Nothing, insertModel = Nothing }, getMachines selectedArea(wrapMsg << GotMachines) )
 
         GotMachines (Ok machines) ->
             ( { model | machines = machines }, Cmd.none )
@@ -93,10 +94,13 @@ update wrapMsg msg model =
             ( model, Cmd.none )
 
         GotMachine (Ok machineInfo) ->
-            ( { model | selectedMachine = Just machineInfo }, getMachines selectedArea (wrapMsg << GotMachines) )
+            let
+                newInfoModel = MachineInfo.init machineInfo
+            in
+            ( { model | infoModel = Just newInfoModel }, getMachines selectedArea (wrapMsg << GotMachines) )
 
         GotMachine (Err _) ->
-            ( { model | selectedMachine = Nothing }, Cmd.none )
+            ( { model | infoModel = Nothing }, Cmd.none )
 
         RangeChanged radius ->
             let
@@ -120,17 +124,28 @@ update wrapMsg msg model =
                                             )}, Cmd.none )
 
                                         Nothing ->
-                                                    if model.selectedMachine == Nothing then
+                                                    if model.infoModel == Nothing then
                                                         ( { model | selectedPoint = Just lngLat }, Cmd.none )
                                                     else
-                                                        ( { model | selectedMachine = Nothing }, Cmd.none )
+                                                        ( { model | infoModel = Nothing }, Cmd.none )
 
+        MachineInfoMsg infoMsg ->
+            if infoMsg == MachineInfo.MachineInfoClosed then
+                ( { model | infoModel = Nothing }, Cmd.none )
+            else
+            case model.infoModel of
 
-        MachineInfoClosed ->
-            ( { model | selectedMachine = Nothing }, Cmd.none )
+                Just infoModel ->
+                    let
+                        ( newInfoModel, cmd ) = MachineInfo.update (wrapMsg << MachineInfoMsg) infoMsg infoModel
+                    in
+                    ( { model | infoModel = Just newInfoModel }, cmd )
+
+                Nothing ->
+                    ( model, Cmd.none )
 
         InsertModeEntered ->
-            ( { model | selectedMachine = Nothing, insertModel = Just InsertMachine.init }, Cmd.none )
+            ( { model | infoModel = Nothing, insertModel = Just InsertMachine.init }, Cmd.none )
 
         InsertMachineMsg insertMsg ->
             case insertMsg of
@@ -344,7 +359,7 @@ view wrapMsg model =
                         [ Html.text "Refresh" ]
 
             in
-    case model.selectedMachine of
+    case model.infoModel of
         Nothing ->
             case model.insertModel of
                 Just _ ->
@@ -352,15 +367,4 @@ view wrapMsg model =
 
                 Nothing -> Html.div [] [ rangeSlider, refreshButton, insertButton ]
 
-        Just info ->
-            Html.div Styles.Attributes.machineInfo
-                [ Html.h2 [] [ Html.text info.address ]
-                , Maybe.withDefault (Html.div [] []) 
-                    <| Maybe.map (\description -> Html.p [] [ Html.text description ]) info.description
-                
-                , Html.button
-                    (Styles.Attributes.closeButton
-                        ++ [ Html.Events.onClick (wrapMsg MachineInfoClosed) ]
-                    )
-                    [ Html.text "X" ]
-                ]
+        Just info -> MachineInfo.view (wrapMsg << MachineInfoMsg) info

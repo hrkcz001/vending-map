@@ -143,16 +143,23 @@ view wrapMsg model =
                                     == Just ""
                                     || model.insertedDetails
                                     == Just ""
-                                    || (model.insertedTimeFrom
-                                    == Nothing
-                                    && model.insertedTimeTo
-                                    /= Nothing)
-                                    || (model.insertedTimeFrom
-                                    /= Nothing
-                                    && model.insertedTimeTo
-                                    == Nothing)
+                                    || timePeriodNotValid model.insertedTimeFrom model.insertedTimeTo
                            , Html.Events.onClick (wrapMsg InsertSubmitted)
                            ]
                     )
                     [ Html.text "Submit" ]
                 ]
+
+timePeriodNotValid : Maybe Time -> Maybe Time -> Bool
+timePeriodNotValid timeFrom timeTo =
+    case (timeFrom, timeTo) of
+        (Nothing, Nothing) ->
+            False
+        (Just from, Just to) ->
+            if from.hours > to.hours then
+                True
+            else if from.hours == to.hours then
+                from.minutes >= to.minutes
+            else
+                False
+        _ -> True
