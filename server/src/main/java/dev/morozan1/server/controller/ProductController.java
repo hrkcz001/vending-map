@@ -27,8 +27,14 @@ public class ProductController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<ProductResponseDto>> getProducts() {
-        List<Product> products = productService.getProducts();
+    public ResponseEntity<List<ProductResponseDto>> getProducts(@RequestParam(required = false) Long excludeMachineId ) {
+
+        List<Product> products;
+        if (excludeMachineId != null) {
+            products = productService.getProductsExcludeMachine(excludeMachineId);
+        } else {
+            products = productService.getProducts();
+        }
         List<ProductResponseDto> productResponseDtoList = products.stream()
                 .map(product -> modelMapper.map(product, ProductResponseDto.class))
                 .toList();

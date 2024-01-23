@@ -9,7 +9,8 @@ module Styles.Attributes exposing
     , header
     , headerBackground
     , availableHours
-    , reviewsShowButton
+    , productsList
+    , cornerButton
     , reviewsList
     , reviewInputForm
     , reviewInputComment
@@ -20,6 +21,7 @@ module Styles.Attributes exposing
     , inputTimeFrom
     , inputTimeTo
     , insertButton
+    , priceInput
     , thumbnail
     , rangeSlider
     , refreshButton
@@ -184,6 +186,29 @@ machineInfo =
     ]
 
 
+productsList : List (Attribute msg)
+productsList =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "50%"
+    , Attributes.style "height" "100%"
+    , Attributes.style "top" "0%"
+    , Attributes.style "left" "50%"
+    , Attributes.style "padding" "1rem"
+    , Attributes.style "overflow" "auto"
+    , Attributes.style "box-sizing" "border-box"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+
+priceInput : List (Attribute msg)
+priceInput =
+    [ Attributes.style "width" "20%"
+    , Attributes.style "height" "5%"
+    , Attributes.style "background-color" "#fff"
+    , Attributes.style "border" "1px solid #000"
+    ]
+
+
 machineDetails : List (Attribute msg)
 machineDetails =
     [ Attributes.style "position" "absolute"
@@ -192,8 +217,8 @@ machineDetails =
     ]
 
 
-reviewsShowButton : List (Attribute msg)
-reviewsShowButton =
+cornerButton : List (Attribute msg)
+cornerButton =
     [ Attributes.style "position" "absolute"
     , Attributes.style "width" "20%"
     , Attributes.style "height" "5%"
@@ -203,6 +228,7 @@ reviewsShowButton =
     , Attributes.style "color" "#000"
     , Attributes.style "text-decoration" "none"
     ]
+
 
 reviewsList : List (Attribute msg)
 reviewsList =

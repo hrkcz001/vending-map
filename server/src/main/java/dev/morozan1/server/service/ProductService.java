@@ -23,6 +23,10 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public List<Product> getProductsExcludeMachine(long excludedMachineId) {
+        return productRepository.findProductsThatNotIn(excludedMachineId);
+    }
+
     public Product getProduct(Long idValue) {
         return productRepository.findById(idValue).orElseThrow();
     }

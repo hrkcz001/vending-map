@@ -90,12 +90,21 @@ postReview machineId review msg =
         , tracker = Nothing
         }
 
-getProducts : (Result Http.Error (List Product) -> msg) -> Cmd msg
-getProducts msg =
+getProducts : Maybe Int ->  (Result Http.Error (List Product) -> msg) -> Cmd msg
+getProducts maybeMachineId msg =
+    let
+        url =
+            case maybeMachineId of
+                Just machineId ->
+                    "api/products?excludeMachineId=" ++ String.fromInt machineId
+
+                Nothing ->
+                    "api/products"
+    in
     Http.request
         { method = "GET"
         , headers = []
-        , url = "api/products"
+        , url = url
         , body = Http.emptyBody
         , expect = Http.expectJson msg (Json.Decode.list productDecoder)
         , timeout = Just 10000
@@ -131,7 +140,7 @@ addProductToMachine machineId productInMachine msg =
     Http.request
         { method = "POST"
         , headers = []
-        , url = "api/machines/" ++ String.fromInt machineId ++ "/products" ++ String.fromInt productInMachine.product.id
+        , url = "api/machines/" ++ String.fromInt machineId ++ "/products/" ++ String.fromInt productInMachine.product.id
         , body = Http.jsonBody <| productInMachineEncoder productInMachine
         , expect = Http.expectJson msg productInMachineDecoder
         , timeout = Just 10000
@@ -143,7 +152,7 @@ updateProductInMachine machineId productInMachine msg =
     Http.request
         { method = "PUT"
         , headers = []
-        , url = "api/machines/" ++ String.fromInt machineId ++ "/products" ++ String.fromInt productInMachine.product.id
+        , url = "api/machines/" ++ String.fromInt machineId ++ "/products/" ++ String.fromInt productInMachine.product.id
         , body = Http.jsonBody <| productInMachineEncoder productInMachine
         , expect = Http.expectJson msg productInMachineDecoder
         , timeout = Just 10000

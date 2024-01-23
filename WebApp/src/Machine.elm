@@ -95,9 +95,10 @@ update wrapMsg msg model =
 
         GotMachine (Ok machineInfo) ->
             let
-                newInfoModel = MachineInfo.init machineInfo
+                ( newInfoModel, infoCmd ) = MachineInfo.init (wrapMsg << MachineInfoMsg) machineInfo
             in
-            ( { model | infoModel = Just newInfoModel }, getMachines selectedArea (wrapMsg << GotMachines) )
+            ( { model | infoModel = Just newInfoModel }, Cmd.batch [ getMachines selectedArea (wrapMsg << GotMachines)
+                                                                   , infoCmd ] )
 
         GotMachine (Err _) ->
             ( { model | infoModel = Nothing }, Cmd.none )
