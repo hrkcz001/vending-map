@@ -27,11 +27,6 @@ import TimePicker exposing (Time)
 import SingleSlider exposing (..)
 import MachineInfo
 
-
-
---| An event on the map
---| id is String because it is used as name for features
-
 type alias Model = { machines : List Machine
                    , selectedRadius : Maybe Float
                    , selectedPoint : Maybe LngLat
@@ -247,13 +242,6 @@ selectedPointLayer model =
         Nothing ->
             []
 
-
---| Information about an event
---| Create a list of sources from a list of events
---| Generates from GeoJSON
---| The sources are used to create layers
-
-
 sourcesFromMachines : Model -> List Source.Source
 sourcesFromMachines model =
     let
@@ -288,11 +276,6 @@ sourcesFromMachines model =
         |> List.singleton
 
 
---| Create a list of layers from a list of events
---| creates a circle layer for each event
---| hover effect by changing opacity
-
-
 layersFromMachines : Model -> List Layer.Layer
 layersFromMachines model =
     List.map
@@ -312,17 +295,9 @@ layersFromMachines model =
         model.machines
 
 
-
---| Create a list of layer names from a list of events
-
-
 listenLayersFromMachines : Model -> List String
 listenLayersFromMachines model =
     List.map (\machine -> "machine." ++ String.fromInt machine.id) model.machines
-
-
-
---| View for the event info
 
 
 view : (Msg -> msg) -> Model -> Html msg

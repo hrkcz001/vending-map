@@ -16,24 +16,6 @@ import Styles.Streets exposing (styleLayers)
 import Machine exposing (selectedPointLayer)
 import Machine exposing (selectedPointSource)
 
-
-{-| The model of the map
-
-  - hoveredFeatures: the features currently hovered by the mouse
-
-  - regions: { name, geometry } to be displayed on the map
-
-  - selectedRegion: the region currently selected
-
-  - events: { id, geometry } to be displayed on the map
-
-  - selectedEvent: the event currently selected
-
-  - insertion messages to insert a new event
-
-  - about: the about text to be displayed
-
--}
 type alias Model =
     { hoveredFeatures : List Json.Encode.Value
     , machineModel : Machine.Model
@@ -41,10 +23,6 @@ type alias Model =
     , mode : Mode
     , about : String
     }
-
-
---| Mode that map is currently working in
---| Mode is needed to change layers and corrsponding sources on the map without reloading it
 
 
 type Mode
@@ -64,11 +42,6 @@ type Msg
     | GotAbout (Result Http.Error String)
 
 
-
---| Initialize the map
---| Get regions, events and about text from the server
-
-
 init : Model
 init =
     { hoveredFeatures = []
@@ -77,10 +50,6 @@ init =
     , productsModel = Products.init
     , about = "Loading..."
     }
-
-
-
---| get a name of a mapbox feature
 
 
 featureName : Json.Decode.Decoder String
@@ -96,10 +65,6 @@ update wrapMsg msg model =
 
         MovedOut _ ->
             ( { model | hoveredFeatures = [] }, Cmd.none )
-
-        --| If the map is in insert mode, clicking on the map will start inserting a new event
-        --| If the map is not in insert mode, clicking on the map will get the feature name and
-        --| request the corresponding info from the server
 
         Click { lngLat, renderedFeatures } ->
             let
@@ -198,8 +163,6 @@ hoveredFeatures =
 view : (Msg -> msg) -> Model -> Html msg
 view wrapMsg model =
     let
-        --| floating content can be either region info, event info or about text
-        --| depending on the current mode
         content =
             case model.mode of
                 Loading ->
@@ -213,8 +176,6 @@ view wrapMsg model =
                     Html.div Styles.Attributes.about
                         [ Html.p [] [ Html.text model.about ]
                         ]
-
-        --| button to start inserting a new event
 
     in
     div []
