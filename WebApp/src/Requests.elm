@@ -16,7 +16,6 @@ import Json.Decode
 import Json.Encode
 import LngLat exposing (LngLat)
 import Types exposing (Machine, Review, Product, ProductInMachine)
-import Time exposing (Month(..))
 
 getMachines : Maybe (LngLat, Float) -> (Result Http.Error (List Machine) -> msg) -> Cmd msg
 getMachines inRadius msg =
@@ -274,11 +273,11 @@ productInMachineDecoder =
         })
         (Json.Decode.field "product" productDecoder)
         (Json.Decode.field "isAvailable" Json.Decode.bool)
-        (Json.Decode.field "price" Json.Decode.float)
+        (Json.Decode.field "price" Json.Decode.int)
 
 productInMachineEncoder : ProductInMachine -> Json.Encode.Value
 productInMachineEncoder productInMachine =
     Json.Encode.object
         [ ( "isAvailable", Json.Encode.bool productInMachine.isAvailable )
-        , ( "price", Json.Encode.float productInMachine.price )
+        , ( "price", Json.Encode.int productInMachine.price )
         ]

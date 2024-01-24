@@ -23,5 +23,5 @@ type alias Product = { id : Int
 
 type alias ProductInMachine = { product : Product
                               , isAvailable : Bool
-                              , price : Float
+                              , price : Int
                               }

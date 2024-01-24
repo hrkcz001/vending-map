@@ -79,7 +79,6 @@ public class GlobalExceptionHandler {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto();
         errorResponseDto.setStatus(HttpStatus.INTERNAL_SERVER_ERROR.value());
         errorResponseDto.setError(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase());
-        errorResponseDto.setReasons(List.of(e.toString()));
         return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

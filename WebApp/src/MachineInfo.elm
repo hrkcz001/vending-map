@@ -145,7 +145,7 @@ update wrapMsg msg model =
         CandidateSelected product ->
             let
                 machineId = model.selectedMachine.id
-                price = Maybe.withDefault 0 <| String.toFloat <| Maybe.withDefault "0" model.candidatePrice
+                price = Maybe.withDefault 0 <| String.toInt <| Maybe.withDefault "0" model.candidatePrice
                 productInMachine = { product = product, price = price, isAvailable = True }
             in
             ( { model | candidateProducts = Nothing, candidatePrice = Nothing }, addProductToMachine machineId productInMachine (wrapMsg << GotProduct) )
@@ -248,7 +248,7 @@ viewProducts : (Msg -> msg) -> Maybe (List ProductInMachine) -> Html msg
 viewProducts wrapMsg maybeProducts =
     let
         price product = if product.isAvailable 
-                        then String.fromFloat product.price ++ " Kč" 
+                        then String.fromInt product.price ++ " Kč" 
                         else "Sold out :("
         
         changeButtonText product = if product.isAvailable 
@@ -274,9 +274,9 @@ viewProducts wrapMsg maybeProducts =
                             Nothing -> [ Html.text "Loading products..." ]
     in
     Html.div Styles.Attributes.productsList <|
-        Html.h2 [] [ Html.text "Products" ] ::
-        productsHtml ++
-        [ Html.button (Styles.Attributes.cornerButton ++ [Html.Events.onClick (wrapMsg CandidatesRequested)]) [ Html.text "Add Product" ] ]
+        [ Html.h2 [] [ Html.text "Products" ]
+        , Html.div Styles.Attributes.slidingList productsHtml
+        , Html.button (Styles.Attributes.cornerButton ++ [Html.Events.onClick (wrapMsg CandidatesRequested)]) [ Html.text "Add Product" ] ]
 
 
 viewCandidates : (Msg -> msg) -> Model -> List Product -> Html msg
@@ -302,23 +302,23 @@ viewCandidates wrapMsg model candidates =
     in
     Html.div Styles.Attributes.productsList <|
         priceInput ++
-        productsHtml ++
-        [ Html.button (Styles.Attributes.cornerButton ++ [Html.Events.onClick (wrapMsg CandidatesClosed)]) [ Html.text "Close" ] ]
+        [ Html.div Styles.Attributes.slidingList productsHtml
+        , Html.button (Styles.Attributes.cornerButton ++ [Html.Events.onClick (wrapMsg CandidatesClosed)]) [ Html.text "Close" ] ]
 
 
 priceNotValid : Maybe String -> Bool
 priceNotValid maybePrice =
     case maybePrice of
         Nothing -> True
-        Just price -> String.toFloat price == Nothing
+        Just price -> Maybe.withDefault True <| Maybe.map (\p -> p <= 0 || p > 1000) <| String.toInt price
 
-pricesDiffToHtmlColor : Float -> Maybe Float -> String
+pricesDiffToHtmlColor : Int -> Maybe Float -> String
 pricesDiffToHtmlColor price1 maybePrice2 =
     case maybePrice2 of
         Nothing -> "black"
         Just price2 ->
-            if price1 > price2
+            if Basics.toFloat price1 > price2
                 then "red"
-                else if price1 < price2
+                else if toFloat price1 < price2
                     then "green"
                     else "black"

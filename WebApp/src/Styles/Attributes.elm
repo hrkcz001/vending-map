@@ -20,6 +20,7 @@ module Styles.Attributes exposing
     , inputDetails
     , inputTimeFrom
     , inputTimeTo
+    , slidingList
     , insertButton
     , priceInput
     , thumbnail
@@ -202,8 +203,10 @@ productsList =
 
 priceInput : List (Attribute msg)
 priceInput =
-    [ Attributes.style "width" "20%"
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "20%"
     , Attributes.style "height" "5%"
+    , Attributes.style "top" "8%"
     , Attributes.style "background-color" "#fff"
     , Attributes.style "border" "1px solid #000"
     ]
@@ -214,6 +217,19 @@ machineDetails =
     [ Attributes.style "position" "absolute"
     , Attributes.style "width" "50%"
     , Attributes.style "height" "100%"
+    ]
+
+
+slidingList : List (Attribute msg)
+slidingList =
+    [ Attributes.style "position" "absolute"
+    , Attributes.style "width" "100%"
+    , Attributes.style "height" "63%"
+    , Attributes.style "top" "22%"
+    , Attributes.style "left" "0%"
+    , Attributes.style "overflow" "auto"
+    , Attributes.style "border-bottom" "1px solid #000"
+    , Attributes.style "border-top" "1px solid #000"
     ]
 
 
@@ -349,9 +365,10 @@ insertingSubmit =
 
 thumbnail : List (Attribute msg)
 thumbnail =
-    [ Attributes.style "width" "30%"
+    [ Attributes.style "width" "100%"
     , Attributes.style "box-sizing" "border-box"
     , Attributes.style "overflow" "hidden"
+    , Attributes.style "background-color" "white"
     , Attributes.style "border" "1px solid #000"
     ]
 

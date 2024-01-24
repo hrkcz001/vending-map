@@ -1,0 +1,13 @@
+Welcome to our website! This project has been an exciting learning experience for me. I had the opportunity to explore various technologies and tools to develop a website focusing on creating a Vending Map, highlighting the locations of vending machines and promoting convenience for users.
+
+For the server-side, I employed Java Spring along with Hibernate, a robust framework for web applications. This combination efficiently handled routing and facilitated the creation of RESTful APIs, providing a solid foundation for the backend infrastructure.
+
+The incorporation of Hibernate ORM into my project simplified my interaction with the PostgreSQL database. It offered a straightforward and intuitive approach to execute SQL queries, retrieve data, and perform essential database tasks seamlessly within my Java codebase.
+
+To optimize performance and organization, I integrated webpack, a module bundler.
+
+For the vending machine map, I utilized Mapbox, a versatile mapping platform. Its APIs and tools assisted me in creating an interactive map displaying the locations of vending machines in different areas.
+
+The core of the web application was written in Java, utilizing the Spring framework. I implemented features such as search functionalities, encouraging users to easily locate vending machines and explore the variety of products they offer.
+
+Throughout the development process, I gained insights into web development practices, including front-end design, back-end integration, and creating an intuitive map experience for users.

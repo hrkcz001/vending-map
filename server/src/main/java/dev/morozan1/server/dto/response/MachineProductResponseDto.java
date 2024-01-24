@@ -7,5 +7,5 @@ public class MachineProductResponseDto {
 
     private ProductResponseDto product;
     private Boolean isAvailable;
-    private Double price;
+    private int price;
 }

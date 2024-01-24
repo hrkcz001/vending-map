@@ -74,12 +74,12 @@ view wrapMsg model =
         [ Html.h3 [] [ Html.text "Add new product" ]
         , Html.input [ Html.Attributes.placeholder "Name, 50 characters max"
                      , Html.Events.onInput (wrapMsg << InsertedName)
-                     , Html.Attributes.style "width" "40%"
+                     , Html.Attributes.style "width" "45%"
                      ] []
         , Html.br [] []
         , Html.input [ Html.Attributes.placeholder "Picture URL, 255 characters max"
                      , Html.Events.onInput (wrapMsg << InsertedPicture)
-                     , Html.Attributes.style "width" "40%"
+                     , Html.Attributes.style "width" "45%"
                      ] []
         , Html.br [] []
         , Html.button [ Html.Attributes.disabled <| (Maybe.withDefault True (Maybe.map (\name -> String.length name == 0 ||  String.length name > 50) model.insertedName))
@@ -87,8 +87,8 @@ view wrapMsg model =
                       , Html.Events.onClick (wrapMsg InsertSubmitted) ] [ Html.text "Submit" ]
         , Html.h3 [] [ Html.text "Products" ]
         , Html.div [ Html.Attributes.style "display" "grid"
-                   , Html.Attributes.style "grid-template-columns" "repeat(3, 1fr)"
-                   , Html.Attributes.style "gap" "10px"] (List.map viewProduct model.products)
+                   , Html.Attributes.style "grid-template-columns" "repeat(5, 1fr)"
+                   , Html.Attributes.style "gap" "3%"] (List.map viewProduct model.products)
         ]
 
 viewProduct : Product -> Html msg
@@ -101,7 +101,6 @@ viewProduct product =
                            , Html.Attributes.style "width" "100%" ] []]
                 , Html.br [] []
                 , Html.text ("-- " ++ product.name)
-                , Html.text <| Maybe.withDefault "" (Maybe.map (\price -> ", average price: " ++ String.fromFloat price) product.averagePrice)
                 , Html.br [] []
                 , Html.br [] []
                 ]

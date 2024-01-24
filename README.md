@@ -14,7 +14,7 @@ Frontend for the vending machine map utilizes Elm, a functional programming lang
 
 ## Main Features
 
-- [ ] Project Description Page: A webpage detailing the objectives, features, and benefits of the vending machine map project.
-- [ ] Vending Machine Map: An interactive map displaying the locations of various vending machines accessible to the public, along with details about the products they offer.
-- [ ] User Registration Form: A registration form allowing users to create accounts for personalized experiences, such as saving favorite vending machine locations and product preferences.
-- [ ] Product Addition Functionality: A feature enabling registered users to suggest or add new products to the vending machines, enhancing the accuracy and completeness of the product information available on the platform.
+- [x] Project Description Page: A webpage detailing the objectives, features, and benefits of the vending machine map project.
+- [x] Vending Machine Map: An interactive map displaying the locations of various vending machines accessible to the public, along with details about the products they offer.
+- [x] Reviews system was added instead. ~~User Registration Form: A registration form allowing users to create accounts for personalized experiences, such as saving favorite vending machine locations and product preferences.~~
+- [x] Product Addition Functionality: A feature enabling registered users to suggest or add new products to the vending machines, enhancing the accuracy and completeness of the product information available on the platform.

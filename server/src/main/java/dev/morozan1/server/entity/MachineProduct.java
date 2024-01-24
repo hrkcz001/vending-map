@@ -34,7 +34,7 @@ public class MachineProduct {
 
     @Setter
     @Column(name = "PRICE", nullable = false)
-    private Double price;
+    private int price;
 
     public void setMachine(Machine machine) {
         Objects.requireNonNull(machine, "Machine must not be null");
