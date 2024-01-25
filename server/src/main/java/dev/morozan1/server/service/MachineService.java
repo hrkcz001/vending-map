@@ -7,11 +7,10 @@ import dev.morozan1.server.repository.ProductRepository;
 import dev.morozan1.server.utils.GeoUtils;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.sql.Time;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class MachineService {
@@ -28,10 +27,11 @@ public class MachineService {
     }
 
     public List<Machine> getMachinesInRadius(double latitude, double longitude, double radius) {
-        double minLatitude = latitude - (radius / 111.32);
-        double maxLatitude = latitude + (radius / 111.32);
-        double minLongitude = longitude - (radius / (111.32 * Math.cos(latitude)));
-        double maxLongitude = longitude + (radius / (111.32 * Math.cos(latitude)));
+        double radiusInDegrees = radius / 111320;
+        double minLatitude = latitude - radiusInDegrees;
+        double maxLatitude = latitude + radiusInDegrees;
+        double minLongitude = longitude - (radiusInDegrees / Math.cos(latitude));
+        double maxLongitude = longitude + (radiusInDegrees / Math.cos(latitude));
 
         List<Machine> machines = machineRepository.findInSquare(minLatitude, maxLatitude, minLongitude, maxLongitude);
         machines = machines.stream()
@@ -50,6 +50,7 @@ public class MachineService {
     }
 
     public Machine updateMachine(long id, Machine machine) {
+        Objects.requireNonNull(machine);
         Machine machineToUpdate = machineRepository.findById(id).orElseThrow();
         machineToUpdate.setAddress(machine.getAddress());
         machineToUpdate.setAvailableTime(machine.getAvailableTime());

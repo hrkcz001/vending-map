@@ -19,7 +19,8 @@ public class MachineToMachineResponseDtoMapper extends AbstractConverter<Machine
 
         //Escape HTML
         machineResponseDto.setAddress(HtmlUtils.htmlEscape(machine.getAddress()));
-        machineResponseDto.setDescription(HtmlUtils.htmlEscape(machine.getDescription()));
+        if (machine.getDescription() != null)
+            machineResponseDto.setDescription(HtmlUtils.htmlEscape(machine.getDescription()));
 
         machineResponseDto.setRating(machine.calculateRating(machine.getReviews()));
         machineResponseDto.setReviewsCount(machine.getReviews().size());

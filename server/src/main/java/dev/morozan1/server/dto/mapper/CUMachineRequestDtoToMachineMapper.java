@@ -22,13 +22,12 @@ public class CUMachineRequestDtoToMachineMapper extends AbstractConverter<CUMach
 
             //Escape HTML
             machine.setAddress(HtmlUtils.htmlEscape(source.getAddress()));
-            machine.setDescription(HtmlUtils.htmlEscape(source.getDescription()));
+            if (source.getDescription() != null)
+                machine.setDescription(HtmlUtils.htmlEscape(source.getDescription()));
 
             CoordinatesDto coordinatesDto = source.getCoordinates();
-            if (coordinatesDto != null) {
-                Pair<Double, Double> coordinates = Pair.of(coordinatesDto.getLatitude(), coordinatesDto.getLongitude());
-                machine.setCoordinates(coordinates);
-            }
+            Pair<Double, Double> coordinates = Pair.of(coordinatesDto.getLatitude(), coordinatesDto.getLongitude());
+            machine.setCoordinates(coordinates);
 
             TimePeriodDto timePeriodDto = source.getAvailableTime();
             if (timePeriodDto != null) {

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ReviewService {
@@ -26,6 +27,7 @@ public class ReviewService {
     }
 
     public Review updateReview(long machineId, long reviewId, Review review) {
+        Objects.requireNonNull(review);
         Review reviewToUpdate = reviewRepository.findByMachineAndReviewIds(machineId, reviewId).orElseThrow();
         reviewToUpdate.setRating(review.getRating());
         reviewToUpdate.setComment(review.getComment());

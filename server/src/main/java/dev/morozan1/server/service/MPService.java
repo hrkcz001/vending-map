@@ -6,6 +6,8 @@ import dev.morozan1.server.repository.MachineProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class MPService {
 
@@ -21,6 +23,7 @@ public class MPService {
         }
 
         public MachineProduct createMachineProduct(MachineProduct machineProduct) {
+            Objects.requireNonNull(machineProduct);
             if (machineProductRepository.findByMachineAndProduct(machineProduct.getMachine().getMachineId(),
                                                                  machineProduct.getProduct().getProductId())
                     .isPresent()) {
@@ -30,6 +33,7 @@ public class MPService {
         }
 
         public MachineProduct updateMachineProduct(MachineProduct machineProduct) {
+            Objects.requireNonNull(machineProduct);
             MachineProduct machineProductToUpdate = machineProductRepository
                     .findByMachineAndProduct(machineProduct.getMachine().getMachineId(),
                                              machineProduct.getProduct().getProductId())

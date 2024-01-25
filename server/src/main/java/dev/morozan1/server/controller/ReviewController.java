@@ -40,12 +40,12 @@ public class ReviewController {
     }
 
     @GetMapping("/{machineId}/reviews/{reviewId}")
-    public ResponseEntity<List<ReviewResponseDto>> getReviewByMachine(@PathVariable long machineId,
+    public ResponseEntity<ReviewResponseDto> getReviewByMachine(@PathVariable long machineId,
                                                                       @PathVariable long reviewId) {
         Review review = reviewService.getReviewByReviewIdAndMachineId(reviewId, machineId);
         ReviewResponseDto reviewResponseDto = modelMapper.map(review, ReviewResponseDto.class);
 
-        return new ResponseEntity<>(List.of(reviewResponseDto), HttpStatus.OK);
+        return new ResponseEntity<>(reviewResponseDto, HttpStatus.OK);
     }
 
     @PostMapping("/{id}/reviews")

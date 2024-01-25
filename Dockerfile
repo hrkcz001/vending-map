@@ -4,7 +4,7 @@ WORKDIR /app
 COPY server/build.gradle server/settings.gradle ./
 COPY server/src ./src
 
-RUN gradle build -x test --no-daemon
+RUN gradle build --no-daemon
 
 FROM node:14 AS buildFrontend
 
